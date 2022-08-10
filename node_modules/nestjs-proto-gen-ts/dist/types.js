@@ -1,0 +1,48 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.EGoogleTypes = exports.EScalarTypes = exports.ENumberTypes = void 0;
+var ENumberTypes;
+(function (ENumberTypes) {
+    ENumberTypes[ENumberTypes["double"] = 0] = "double";
+    ENumberTypes[ENumberTypes["float"] = 1] = "float";
+    ENumberTypes[ENumberTypes["int32"] = 2] = "int32";
+    ENumberTypes[ENumberTypes["int64"] = 3] = "int64";
+    ENumberTypes[ENumberTypes["uint32"] = 4] = "uint32";
+    ENumberTypes[ENumberTypes["uint64"] = 5] = "uint64";
+    ENumberTypes[ENumberTypes["sint32"] = 6] = "sint32";
+    ENumberTypes[ENumberTypes["sint64"] = 7] = "sint64";
+    ENumberTypes[ENumberTypes["fixed32"] = 8] = "fixed32";
+    ENumberTypes[ENumberTypes["fixed64"] = 9] = "fixed64";
+    ENumberTypes[ENumberTypes["sfixed32"] = 10] = "sfixed32";
+    ENumberTypes[ENumberTypes["sfixed64"] = 11] = "sfixed64";
+})(ENumberTypes = exports.ENumberTypes || (exports.ENumberTypes = {}));
+var EScalarTypes;
+(function (EScalarTypes) {
+    EScalarTypes[EScalarTypes["string"] = 0] = "string";
+    EScalarTypes[EScalarTypes["bool"] = 1] = "bool";
+    EScalarTypes[EScalarTypes["bytes"] = 2] = "bytes";
+    EScalarTypes[EScalarTypes["double"] = 3] = "double";
+    EScalarTypes[EScalarTypes["float"] = 4] = "float";
+    EScalarTypes[EScalarTypes["int32"] = 5] = "int32";
+    EScalarTypes[EScalarTypes["int64"] = 6] = "int64";
+    EScalarTypes[EScalarTypes["uint32"] = 7] = "uint32";
+    EScalarTypes[EScalarTypes["uint64"] = 8] = "uint64";
+    EScalarTypes[EScalarTypes["sint32"] = 9] = "sint32";
+    EScalarTypes[EScalarTypes["sint64"] = 10] = "sint64";
+    EScalarTypes[EScalarTypes["fixed32"] = 11] = "fixed32";
+    EScalarTypes[EScalarTypes["fixed64"] = 12] = "fixed64";
+    EScalarTypes[EScalarTypes["sfixed32"] = 13] = "sfixed32";
+    EScalarTypes[EScalarTypes["sfixed64"] = 14] = "sfixed64";
+})(EScalarTypes = exports.EScalarTypes || (exports.EScalarTypes = {}));
+var EGoogleTypes;
+(function (EGoogleTypes) {
+    EGoogleTypes[EGoogleTypes["Any"] = 0] = "Any";
+    EGoogleTypes[EGoogleTypes["Timestamp"] = 1] = "Timestamp";
+    EGoogleTypes[EGoogleTypes["Duration"] = 2] = "Duration";
+    EGoogleTypes[EGoogleTypes["Struct"] = 3] = "Struct";
+    EGoogleTypes[EGoogleTypes["Wrapper"] = 4] = "Wrapper";
+    EGoogleTypes[EGoogleTypes["FieldMask"] = 5] = "FieldMask";
+    EGoogleTypes[EGoogleTypes["ListValue"] = 6] = "ListValue";
+    EGoogleTypes[EGoogleTypes["Value"] = 7] = "Value";
+    EGoogleTypes[EGoogleTypes["NullValue"] = 8] = "NullValue";
+})(EGoogleTypes = exports.EGoogleTypes || (exports.EGoogleTypes = {}));
