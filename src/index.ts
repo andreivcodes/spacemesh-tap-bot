@@ -83,13 +83,6 @@ async function sendSmesh({ to, amount }: { to: string; amount: number }) {
   const saltAsUint8Array = enc.encode("Spacemesh blockmesh");
   let publicKey = new Uint8Array(32);
   let secretKey = new Uint8Array(64);
-  const saveKeys = (pk: Uint8Array, sk: Uint8Array) => {
-    if (pk === null || sk === null) {
-      throw new Error("key generation failed");
-    }
-    publicKey = pk;
-    secretKey = sk;
-  };
 
   const crypto = require("crypto");
   globalThis.crypto = {
@@ -104,12 +97,7 @@ async function sendSmesh({ to, amount }: { to: string; amount: number }) {
     .then((wasm) => {
       secretKey =
         // @ts-ignore
-        __deriveNewKeyPair(
-          slicedSenderPrivateKey,
-          0,
-          saltAsUint8Array,
-          saveKeys
-        );
+        __deriveNewKeyPair(slicedSenderPrivateKey, 0, saltAsUint8Array);
       publicKey = secretKey.slice(32);
     })
     .catch((error) => {
