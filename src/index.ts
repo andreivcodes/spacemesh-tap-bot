@@ -19,6 +19,7 @@ import { mnemonicToSeedSync } from "bip39";
 const { Client, GatewayIntentBits } = require("discord.js");
 var xdr = require("js-xdr");
 const fs = require("fs");
+require("dotenv").config();
 
 //https://discord.com/api/oauth2/authorize?client_id=1006876873139163176&permissions=1088&scope=bot
 
@@ -39,21 +40,19 @@ function main() {
 
   client.on("messageCreate", async (message: any) => {
     //our special channel
-    if (message.channel.name == "tap") {
+    if (message.channel.name == "🏦tap" || message.channel.name == "tap") {
       try {
         let address = (message.content as string).slice(2);
         console.log(message.content);
         await sendSmesh({ to: address, amount: 42069 });
-        message.react("👍");
+        message.reply(`just 💸  transferred funds to ${message.content}`);
       } catch (e) {
         console.log(e);
       }
     }
   });
 
-  client.login(
-    "MTAwNjg3Njg3MzEzOTE2MzE3Ng.GoYhfG.B2rae3YmBkGJVt0hFLQQQCB3e9qJyce3ZLFM0Y"
-  );
+  client.login(process.env.TOKEN);
 }
 
 const channel = createChannel(
