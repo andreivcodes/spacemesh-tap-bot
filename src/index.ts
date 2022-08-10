@@ -19,7 +19,8 @@ import { mnemonicToSeedSync } from "bip39";
 const { Client, GatewayIntentBits } = require("discord.js");
 var xdr = require("js-xdr");
 const fs = require("fs");
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 
 //https://discord.com/api/oauth2/authorize?client_id=1006876873139163176&permissions=1088&scope=bot
 
