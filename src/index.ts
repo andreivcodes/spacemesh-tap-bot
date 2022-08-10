@@ -20,7 +20,6 @@ const { Client, GatewayIntentBits } = require("discord.js");
 var xdr = require("js-xdr");
 const fs = require("fs");
 const path = require("path");
-require("dotenv").config({ path: path.join(__dirname, ".env") });
 
 //https://discord.com/api/oauth2/authorize?client_id=1006876873139163176&permissions=1088&scope=bot
 
@@ -53,7 +52,9 @@ function main() {
     }
   });
 
-  client.login(process.env.TOKEN);
+  client.login(
+    "MTAwNjg3Njg3MzEzOTE2MzE3Ng.Giv77l.OegH1rJfCXpd2TozqKwJZA3mxBAC_51qdE2KDw"
+  );
 }
 
 const channel = createChannel(
