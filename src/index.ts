@@ -45,10 +45,11 @@ function main() {
     //our special channel
     if (message.channel.name == "🏦tap" || message.channel.name == "tap") {
       try {
-        let address = (message.content as string).slice(2);
-        console.log(message.content);
-        await sendSmesh({ to: address, amount: 42069 });
-        message.reply(`just 💸  transferred funds to ${message.content}`);
+        if (message.member.displayName != "spacemesh-tap-bot") {
+          let address = (message.content as string).slice(2);
+          await sendSmesh({ to: address, amount: 42069 });
+          message.reply(`just 💸  transferred funds to ${message.content}`);
+        }
       } catch (e) {
         console.log(e);
       }
