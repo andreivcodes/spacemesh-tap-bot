@@ -16,6 +16,7 @@ import {
 import { AccountId } from "./proto/gen/spacemesh/v1/types";
 import { mnemonicToSeedSync } from "bip39";
 import { loadWasm, signTransaction, toHexString } from "./util";
+import { Message } from "discord.js";
 const { Client, GatewayIntentBits } = require("discord.js");
 require("dotenv").config();
 
@@ -47,8 +48,7 @@ function main() {
       try {
         if (message.member.displayName != "spacemesh-tap-bot") {
           let address = (message.content as string).slice(2);
-          await sendSmesh({ to: address, amount: 42069 });
-          message.reply(`just 💸  transferred funds to ${message.content}`);
+          await sendSmesh({ to: address, amount: 42069, message: message });
         }
       } catch (e) {
         console.log(e);
@@ -59,7 +59,15 @@ function main() {
   client.login(process.env.TOKEN!);
 }
 
-async function sendSmesh({ to, amount }: { to: string; amount: number }) {
+async function sendSmesh({
+  to,
+  amount,
+  message,
+}: {
+  to: string;
+  amount: number;
+  message: Message;
+}) {
   const senderPrivateKey = mnemonicToSeedSync(senderSeed);
 
   const slicedSenderPrivateKey = new Uint8Array(senderPrivateKey.slice(32));
@@ -128,7 +136,16 @@ async function sendSmesh({ to, amount }: { to: string; amount: number }) {
     channel
   );
 
-  transactionClient.submitTransaction({ transaction: tx as Uint8Array });
+  transactionClient
+    .submitTransaction({
+      transaction: tx as Uint8Array,
+    })
+    .then((result) => {
+      console.log(result);
+      if (result.status?.code != 13) {
+        message.reply(`just 💸  transferred funds to ${message.content}`);
+      } else message.reply(`could not transfer :(`);
+    });
 }
 
 main();
