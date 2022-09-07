@@ -48,7 +48,7 @@ function main() {
       try {
         if (message.member.displayName != "spacemesh-tap-bot") {
           let address = (message.content as string).slice(2);
-          await sendSmesh({ to: address, amount: 42069, message: message });
+          await sendSmesh({ to: address, amount: 1000, message: message });
         }
       } catch (e) {
         console.log(e);
