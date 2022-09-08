@@ -171,8 +171,7 @@ async function sendSmesh({
               transaction: tx as Uint8Array,
             })
             .then((result) => {
-              console.log(result);
-              if (result.status?.code != 13) {
+              if (result.status?.code == 0) {
                 message.reply(
                   `just 💸  transferred funds to ${message.content}`
                 );
