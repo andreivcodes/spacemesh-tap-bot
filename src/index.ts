@@ -7,7 +7,6 @@ import {
   AccountDataFilter,
   AccountDataFlag,
   AccountDataQueryRequest,
-  AccountDataQueryResponse,
 } from "./proto/gen/spacemesh/v1/global_state_types";
 import {
   TransactionServiceClient,
@@ -115,36 +114,41 @@ async function sendSmesh({
     offset: 0,
   };
 
-  let accountQueryResponse: AccountDataQueryResponse =
-    await accountClient.accountDataQuery(accountQuery);
+  await accountClient
+    .accountDataQuery(accountQuery)
+    .then(async (result) => {
+      let senderAccountNonce =
+        result.accountItem[0].accountWrapper?.stateProjected?.counter;
 
-  let senderAccountNonce =
-    accountQueryResponse.accountItem[0].accountWrapper?.stateProjected?.counter;
+      let tx = await signTransaction({
+        accountNonce: senderAccountNonce ?? 0,
+        receiver: to,
+        price: 1,
+        amount: amount,
+        secretKey: toHexString(secretKey),
+      });
 
-  let tx = await signTransaction({
-    accountNonce: senderAccountNonce!,
-    receiver: to,
-    price: 1,
-    amount: amount,
-    secretKey: toHexString(secretKey),
-  });
+      const transactionClient: TransactionServiceClient = createClient(
+        TransactionServiceDefinition,
+        channel
+      );
 
-  console.log("tx: " + toHexString(tx));
-
-  const transactionClient: TransactionServiceClient = createClient(
-    TransactionServiceDefinition,
-    channel
-  );
-
-  transactionClient
-    .submitTransaction({
-      transaction: tx as Uint8Array,
+      transactionClient
+        .submitTransaction({
+          transaction: tx as Uint8Array,
+        })
+        .then((result) => {
+          console.log(result);
+          if (result.status?.code != 13) {
+            message.reply(`just 💸  transferred funds to ${message.content}`);
+          } else message.reply(`could not transfer :(`);
+        })
+        .catch((e) => {
+          message.reply(`could not transfer :(`);
+        });
     })
-    .then((result) => {
-      console.log(result);
-      if (result.status?.code != 13) {
-        message.reply(`just 💸  transferred funds to ${message.content}`);
-      } else message.reply(`could not transfer :(`);
+    .catch((e) => {
+      message.reply(`could not transfer :(`);
     });
 }
 
