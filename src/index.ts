@@ -180,12 +180,10 @@ async function sendSmesh({
             })
             .catch((e) => {
               console.log(e);
-              message.reply(`could not transfer :(`);
             });
         })
         .catch((e) => {
           console.log(e);
-          message.reply(`could not transfer :(`);
         });
     }
   );
