@@ -23,7 +23,7 @@ require("dotenv").config();
 //https://discord.com/api/oauth2/authorize?client_id=1006876873139163176&permissions=1088&scope=bot
 
 const channel = createChannel(
-  "api-devnet225.spacemesh.io:443",
+  "api-devnet226.spacemesh.io:443",
   ChannelCredentials.createSsl()
 );
 
