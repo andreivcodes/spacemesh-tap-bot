@@ -1,22 +1,6 @@
+import { loadWasm } from "./wasm_loader";
+
 var xdr = require("js-xdr");
-const fs = require("fs");
-const path = require("path");
-
-declare var Go: any;
-
-export function loadWasm(path: string) {
-  const go = new Go();
-  return new Promise((resolve, reject) => {
-    WebAssembly.instantiate(fs.readFileSync(path), go.importObject)
-      .then((result) => {
-        go.run(result.instance);
-        resolve(result.instance);
-      })
-      .catch((error) => {
-        reject(error);
-      });
-  });
-}
 
 export const signTransaction = ({
   accountNonce,
@@ -67,7 +51,7 @@ export const signTransaction = ({
     const bufMessageAsUint8Array = new Uint8Array(bufMessage);
 
     await loadWasm("./src/ed25519.wasm")
-      .then((wasm) => {
+      .then(() => {
         let sig =
           // @ts-ignore
           __signTransaction(sk, bufMessageAsUint8Array);

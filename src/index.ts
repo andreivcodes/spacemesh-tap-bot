@@ -19,15 +19,24 @@ import {
 } from "./proto/gen/spacemesh/v1/tx";
 import { AccountId } from "./proto/gen/spacemesh/v1/types";
 import { mnemonicToSeedSync } from "bip39";
-import { loadWasm, signTransaction, toHexString } from "./util";
+import { signTransaction, toHexString } from "./util";
 import { Message } from "discord.js";
+import fetch from "node-fetch";
+import { TextEncoder } from "util";
+import { loadWasm } from "./wasm_loader";
 const { Client, GatewayIntentBits } = require("discord.js");
-const request = require("request");
 require("dotenv").config();
 
 //https://discord.com/api/oauth2/authorize?client_id=1006876873139163176&permissions=1088&scope=bot
 
+declare global {
+  function crypto(): string;
+}
 const senderSeed: string = process.env.SEEDPHRASE!;
+let url = "https://discover.spacemesh.io/networks.json";
+let networkUrl: String;
+let channel: Channel;
+let initialMsgSend = false;
 
 function main() {
   const client = new Client({
@@ -47,6 +56,7 @@ function main() {
     if (message.channel.name == "🏦tap" || message.channel.name == "tap") {
       try {
         if (message.member.displayName != "spacemesh-tap-bot") {
+          await getNetwork();
           let address = (message.content as string).slice(2);
           await sendSmesh({ to: address, amount: 1000, message: message });
         }
@@ -57,6 +67,18 @@ function main() {
   });
 
   client.login(process.env.TOKEN!);
+}
+
+async function getNetwork() {
+  await fetch(url)
+    .then((response) => response.json())
+    .then((res: any) => {
+      networkUrl = res[0]["grpcAPI"].slice(0, -1).substring(8);
+      channel = createChannel(
+        `${networkUrl}:443`,
+        ChannelCredentials.createSsl()
+      );
+    });
 }
 
 async function sendSmesh({
@@ -87,7 +109,7 @@ async function sendSmesh({
   require("./wasm_exec");
 
   await loadWasm("./src/ed25519.wasm")
-    .then((wasm) => {
+    .then(() => {
       secretKey =
         // @ts-ignore
         __deriveNewKeyPair(slicedSenderPrivateKey, 0, saltAsUint8Array);
@@ -97,95 +119,61 @@ async function sendSmesh({
       console.log("ouch", error);
     });
 
-  let url = "https://discover.spacemesh.io/networks.json";
-  let options = { json: true };
-  let networkUrl: String;
-  let channel: Channel;
+  channel = createChannel(`${networkUrl}:443`, ChannelCredentials.createSsl());
 
-  request(
-    url,
-    options,
-    async (
-      error: any,
-      res: { statusCode: number; body: { [x: string]: string }[] },
-      body: any
-    ) => {
-      if (error) {
-        console.log(error);
-        message.reply(`could not transfer :(`);
-      }
+  const accountClient: GlobalStateServiceClient = createClient(
+    GlobalStateServiceDefinition,
+    channel
+  );
 
-      try {
-        if (!error && res.statusCode == 200) {
-          networkUrl = res.body[0]["grpcAPI"].slice(0, -1).substring(8);
-        }
-      } catch (e) {
-        console.log(e);
-        message.reply(`could not transfer :(`);
-      }
+  const accountQueryId: AccountId = { address: publicKey };
 
-      channel = createChannel(
-        `${networkUrl}:443`,
-        ChannelCredentials.createSsl()
-      );
+  const accountQueryFilter: AccountDataFilter = {
+    accountId: accountQueryId,
+    accountDataFlags: AccountDataFlag.ACCOUNT_DATA_FLAG_ACCOUNT,
+  };
 
-      const accountClient: GlobalStateServiceClient = createClient(
-        GlobalStateServiceDefinition,
+  const accountQuery: AccountDataQueryRequest = {
+    filter: accountQueryFilter,
+    maxResults: 1,
+    offset: 0,
+  };
+
+  await accountClient
+    .accountDataQuery(accountQuery)
+    .then(async (result) => {
+      let senderAccountNonce =
+        result.accountItem[0].accountWrapper?.stateProjected?.counter;
+
+      let tx = await signTransaction({
+        accountNonce: senderAccountNonce ?? 0,
+        receiver: to,
+        price: 1,
+        amount: amount,
+        secretKey: toHexString(secretKey),
+      });
+
+      const transactionClient: TransactionServiceClient = createClient(
+        TransactionServiceDefinition,
         channel
       );
 
-      const accountQueryId: AccountId = { address: publicKey };
-
-      const accountQueryFilter: AccountDataFilter = {
-        accountId: accountQueryId,
-        accountDataFlags: AccountDataFlag.ACCOUNT_DATA_FLAG_ACCOUNT,
-      };
-
-      const accountQuery: AccountDataQueryRequest = {
-        filter: accountQueryFilter,
-        maxResults: 1,
-        offset: 0,
-      };
-
-      await accountClient
-        .accountDataQuery(accountQuery)
-        .then(async (result) => {
-          let senderAccountNonce =
-            result.accountItem[0].accountWrapper?.stateProjected?.counter;
-
-          let tx = await signTransaction({
-            accountNonce: senderAccountNonce ?? 0,
-            receiver: to,
-            price: 1,
-            amount: amount,
-            secretKey: toHexString(secretKey),
-          });
-
-          const transactionClient: TransactionServiceClient = createClient(
-            TransactionServiceDefinition,
-            channel
-          );
-
-          transactionClient
-            .submitTransaction({
-              transaction: tx as Uint8Array,
-            })
-            .then((result) => {
-              if (result.status?.code == 0) {
-                message.reply(
-                  `just 💸  transferred funds to ${message.content}`
-                );
-              } else message.reply(`could not transfer :(`);
-            })
-            .catch((e) => {
-              console.log(e);
-            });
+      transactionClient
+        .submitTransaction({
+          transaction: tx as Uint8Array,
+        })
+        .then((result) => {
+          if (result.status?.code == 0) {
+            message.reply(`just 💸  transferred funds to ${message.content}`);
+          } else message.reply(`could not transfer :(`);
         })
         .catch((e) => {
           console.log(e);
         });
-    }
-  );
+    })
+    .catch((e) => {
+      console.log(e);
+    });
 }
 
 main();
