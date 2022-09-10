@@ -1,22 +1,24 @@
 /* eslint-disable */
+import Long from "long";
 import { CallContext, CallOptions } from "nice-grpc-common";
+import _m0 from "protobufjs/minimal";
 import {
-  GlobalStateHashRequest,
-  GlobalStateHashResponse,
-  AccountRequest,
-  AccountResponse,
   AccountDataQueryRequest,
   AccountDataQueryResponse,
-  SmesherDataQueryRequest,
-  SmesherDataQueryResponse,
   AccountDataStreamRequest,
   AccountDataStreamResponse,
-  SmesherRewardStreamRequest,
-  SmesherRewardStreamResponse,
+  AccountRequest,
+  AccountResponse,
   AppEventStreamRequest,
   AppEventStreamResponse,
+  GlobalStateHashRequest,
+  GlobalStateHashResponse,
   GlobalStateStreamRequest,
   GlobalStateStreamResponse,
+  SmesherDataQueryRequest,
+  SmesherDataQueryResponse,
+  SmesherRewardStreamRequest,
+  SmesherRewardStreamResponse,
 } from "./global_state_types";
 
 export const protobufPackage = "spacemesh.v1";
@@ -127,13 +129,10 @@ export interface GlobalStateServiceServiceImplementation<CallContextExt = {}> {
   /** Latest computed global state - layer and its root hash */
   globalStateHash(
     request: GlobalStateHashRequest,
-    context: CallContext & CallContextExt
+    context: CallContext & CallContextExt,
   ): Promise<DeepPartial<GlobalStateHashResponse>>;
   /** Account info in the current global state. */
-  account(
-    request: AccountRequest,
-    context: CallContext & CallContextExt
-  ): Promise<DeepPartial<AccountResponse>>;
+  account(request: AccountRequest, context: CallContext & CallContextExt): Promise<DeepPartial<AccountResponse>>;
   /**
    * Query for account related data such as rewards, tx receipts and account info
    *
@@ -144,7 +143,7 @@ export interface GlobalStateServiceServiceImplementation<CallContextExt = {}> {
    */
   accountDataQuery(
     request: AccountDataQueryRequest,
-    context: CallContext & CallContextExt
+    context: CallContext & CallContextExt,
   ): Promise<DeepPartial<AccountDataQueryResponse>>;
   /**
    * Query for smesher data. Currently returns smesher rewards.
@@ -153,7 +152,7 @@ export interface GlobalStateServiceServiceImplementation<CallContextExt = {}> {
    */
   smesherDataQuery(
     request: SmesherDataQueryRequest,
-    context: CallContext & CallContextExt
+    context: CallContext & CallContextExt,
   ): Promise<DeepPartial<SmesherDataQueryResponse>>;
   /**
    * Get a stream of account related changes such as account balance change,
@@ -161,12 +160,12 @@ export interface GlobalStateServiceServiceImplementation<CallContextExt = {}> {
    */
   accountDataStream(
     request: AccountDataStreamRequest,
-    context: CallContext & CallContextExt
+    context: CallContext & CallContextExt,
   ): ServerStreamingMethodResult<DeepPartial<AccountDataStreamResponse>>;
   /** Rewards awarded to a smesher id */
   smesherRewardStream(
     request: SmesherRewardStreamRequest,
-    context: CallContext & CallContextExt
+    context: CallContext & CallContextExt,
   ): ServerStreamingMethodResult<DeepPartial<SmesherRewardStreamResponse>>;
   /**
    * App Events - emitted by app methods impl code trigged by an
@@ -174,12 +173,12 @@ export interface GlobalStateServiceServiceImplementation<CallContextExt = {}> {
    */
   appEventStream(
     request: AppEventStreamRequest,
-    context: CallContext & CallContextExt
+    context: CallContext & CallContextExt,
   ): ServerStreamingMethodResult<DeepPartial<AppEventStreamResponse>>;
   /** New global state computed for a layer by the STF */
   globalStateStream(
     request: GlobalStateStreamRequest,
-    context: CallContext & CallContextExt
+    context: CallContext & CallContextExt,
   ): ServerStreamingMethodResult<DeepPartial<GlobalStateStreamResponse>>;
 }
 
@@ -187,13 +186,10 @@ export interface GlobalStateServiceClient<CallOptionsExt = {}> {
   /** Latest computed global state - layer and its root hash */
   globalStateHash(
     request: DeepPartial<GlobalStateHashRequest>,
-    options?: CallOptions & CallOptionsExt
+    options?: CallOptions & CallOptionsExt,
   ): Promise<GlobalStateHashResponse>;
   /** Account info in the current global state. */
-  account(
-    request: DeepPartial<AccountRequest>,
-    options?: CallOptions & CallOptionsExt
-  ): Promise<AccountResponse>;
+  account(request: DeepPartial<AccountRequest>, options?: CallOptions & CallOptionsExt): Promise<AccountResponse>;
   /**
    * Query for account related data such as rewards, tx receipts and account info
    *
@@ -204,7 +200,7 @@ export interface GlobalStateServiceClient<CallOptionsExt = {}> {
    */
   accountDataQuery(
     request: DeepPartial<AccountDataQueryRequest>,
-    options?: CallOptions & CallOptionsExt
+    options?: CallOptions & CallOptionsExt,
   ): Promise<AccountDataQueryResponse>;
   /**
    * Query for smesher data. Currently returns smesher rewards.
@@ -213,7 +209,7 @@ export interface GlobalStateServiceClient<CallOptionsExt = {}> {
    */
   smesherDataQuery(
     request: DeepPartial<SmesherDataQueryRequest>,
-    options?: CallOptions & CallOptionsExt
+    options?: CallOptions & CallOptionsExt,
   ): Promise<SmesherDataQueryResponse>;
   /**
    * Get a stream of account related changes such as account balance change,
@@ -221,12 +217,12 @@ export interface GlobalStateServiceClient<CallOptionsExt = {}> {
    */
   accountDataStream(
     request: DeepPartial<AccountDataStreamRequest>,
-    options?: CallOptions & CallOptionsExt
+    options?: CallOptions & CallOptionsExt,
   ): AsyncIterable<AccountDataStreamResponse>;
   /** Rewards awarded to a smesher id */
   smesherRewardStream(
     request: DeepPartial<SmesherRewardStreamRequest>,
-    options?: CallOptions & CallOptionsExt
+    options?: CallOptions & CallOptionsExt,
   ): AsyncIterable<SmesherRewardStreamResponse>;
   /**
    * App Events - emitted by app methods impl code trigged by an
@@ -234,34 +230,26 @@ export interface GlobalStateServiceClient<CallOptionsExt = {}> {
    */
   appEventStream(
     request: DeepPartial<AppEventStreamRequest>,
-    options?: CallOptions & CallOptionsExt
+    options?: CallOptions & CallOptionsExt,
   ): AsyncIterable<AppEventStreamResponse>;
   /** New global state computed for a layer by the STF */
   globalStateStream(
     request: DeepPartial<GlobalStateStreamRequest>,
-    options?: CallOptions & CallOptionsExt
+    options?: CallOptions & CallOptionsExt,
   ): AsyncIterable<GlobalStateStreamResponse>;
 }
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-export type DeepPartial<T> = T extends Builtin
-  ? T
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
+export type DeepPartial<T> = T extends Builtin ? T
+  : T extends Long ? string | number | Long : T extends Array<infer U> ? Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
-export type ServerStreamingMethodResult<Response> = {
-  [Symbol.asyncIterator](): AsyncIterator<Response, void>;
-};
+if (_m0.util.Long !== Long) {
+  _m0.util.Long = Long as any;
+  _m0.configure();
+}
+
+export type ServerStreamingMethodResult<Response> = { [Symbol.asyncIterator](): AsyncIterator<Response, void> };

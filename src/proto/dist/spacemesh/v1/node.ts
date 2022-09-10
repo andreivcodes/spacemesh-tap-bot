@@ -1,24 +1,26 @@
 /* eslint-disable */
+import Long from "long";
 import { CallContext, CallOptions } from "nice-grpc-common";
+import _m0 from "protobufjs/minimal";
+import { Empty } from "../../google/protobuf/empty";
 import {
+  BuildResponse,
   EchoRequest,
   EchoResponse,
-  VersionResponse,
-  BuildResponse,
-  StatusRequest,
-  StatusResponse,
-  SyncStartRequest,
-  SyncStartResponse,
-  ShutdownRequest,
-  ShutdownResponse,
-  UpdatePoetServerRequest,
-  UpdatePoetServerResponse,
-  StatusStreamRequest,
-  StatusStreamResponse,
   ErrorStreamRequest,
   ErrorStreamResponse,
+  ShutdownRequest,
+  ShutdownResponse,
+  StatusRequest,
+  StatusResponse,
+  StatusStreamRequest,
+  StatusStreamResponse,
+  SyncStartRequest,
+  SyncStartResponse,
+  UpdatePoetServerRequest,
+  UpdatePoetServerResponse,
+  VersionResponse,
 } from "./node_types";
-import { Empty } from "../../google/protobuf/empty";
 
 export const protobufPackage = "spacemesh.v1";
 
@@ -114,119 +116,75 @@ export const NodeServiceDefinition = {
 
 export interface NodeServiceServiceImplementation<CallContextExt = {}> {
   /** A simple test endpoint */
-  echo(
-    request: EchoRequest,
-    context: CallContext & CallContextExt
-  ): Promise<DeepPartial<EchoResponse>>;
+  echo(request: EchoRequest, context: CallContext & CallContextExt): Promise<DeepPartial<EchoResponse>>;
   /** Returns the version of the node software as a semver string */
-  version(
-    request: Empty,
-    context: CallContext & CallContextExt
-  ): Promise<DeepPartial<VersionResponse>>;
+  version(request: Empty, context: CallContext & CallContextExt): Promise<DeepPartial<VersionResponse>>;
   /** Returns the github commit hash used to build the node */
-  build(
-    request: Empty,
-    context: CallContext & CallContextExt
-  ): Promise<DeepPartial<BuildResponse>>;
+  build(request: Empty, context: CallContext & CallContextExt): Promise<DeepPartial<BuildResponse>>;
   /** Current node status (net and sync) */
-  status(
-    request: StatusRequest,
-    context: CallContext & CallContextExt
-  ): Promise<DeepPartial<StatusResponse>>;
+  status(request: StatusRequest, context: CallContext & CallContextExt): Promise<DeepPartial<StatusResponse>>;
   /** Request that the node start syncing the mesh */
-  syncStart(
-    request: SyncStartRequest,
-    context: CallContext & CallContextExt
-  ): Promise<DeepPartial<SyncStartResponse>>;
+  syncStart(request: SyncStartRequest, context: CallContext & CallContextExt): Promise<DeepPartial<SyncStartResponse>>;
   /** Request that the node initiate graceful shutdown */
-  shutdown(
-    request: ShutdownRequest,
-    context: CallContext & CallContextExt
-  ): Promise<DeepPartial<ShutdownResponse>>;
+  shutdown(request: ShutdownRequest, context: CallContext & CallContextExt): Promise<DeepPartial<ShutdownResponse>>;
   /** UpdatePoetServer updates poet server */
   updatePoetServer(
     request: UpdatePoetServerRequest,
-    context: CallContext & CallContextExt
+    context: CallContext & CallContextExt,
   ): Promise<DeepPartial<UpdatePoetServerResponse>>;
   /** Node status events (sync and net) */
   statusStream(
     request: StatusStreamRequest,
-    context: CallContext & CallContextExt
+    context: CallContext & CallContextExt,
   ): ServerStreamingMethodResult<DeepPartial<StatusStreamResponse>>;
   /** Node error events */
   errorStream(
     request: ErrorStreamRequest,
-    context: CallContext & CallContextExt
+    context: CallContext & CallContextExt,
   ): ServerStreamingMethodResult<DeepPartial<ErrorStreamResponse>>;
 }
 
 export interface NodeServiceClient<CallOptionsExt = {}> {
   /** A simple test endpoint */
-  echo(
-    request: DeepPartial<EchoRequest>,
-    options?: CallOptions & CallOptionsExt
-  ): Promise<EchoResponse>;
+  echo(request: DeepPartial<EchoRequest>, options?: CallOptions & CallOptionsExt): Promise<EchoResponse>;
   /** Returns the version of the node software as a semver string */
-  version(
-    request: DeepPartial<Empty>,
-    options?: CallOptions & CallOptionsExt
-  ): Promise<VersionResponse>;
+  version(request: DeepPartial<Empty>, options?: CallOptions & CallOptionsExt): Promise<VersionResponse>;
   /** Returns the github commit hash used to build the node */
-  build(
-    request: DeepPartial<Empty>,
-    options?: CallOptions & CallOptionsExt
-  ): Promise<BuildResponse>;
+  build(request: DeepPartial<Empty>, options?: CallOptions & CallOptionsExt): Promise<BuildResponse>;
   /** Current node status (net and sync) */
-  status(
-    request: DeepPartial<StatusRequest>,
-    options?: CallOptions & CallOptionsExt
-  ): Promise<StatusResponse>;
+  status(request: DeepPartial<StatusRequest>, options?: CallOptions & CallOptionsExt): Promise<StatusResponse>;
   /** Request that the node start syncing the mesh */
-  syncStart(
-    request: DeepPartial<SyncStartRequest>,
-    options?: CallOptions & CallOptionsExt
-  ): Promise<SyncStartResponse>;
+  syncStart(request: DeepPartial<SyncStartRequest>, options?: CallOptions & CallOptionsExt): Promise<SyncStartResponse>;
   /** Request that the node initiate graceful shutdown */
-  shutdown(
-    request: DeepPartial<ShutdownRequest>,
-    options?: CallOptions & CallOptionsExt
-  ): Promise<ShutdownResponse>;
+  shutdown(request: DeepPartial<ShutdownRequest>, options?: CallOptions & CallOptionsExt): Promise<ShutdownResponse>;
   /** UpdatePoetServer updates poet server */
   updatePoetServer(
     request: DeepPartial<UpdatePoetServerRequest>,
-    options?: CallOptions & CallOptionsExt
+    options?: CallOptions & CallOptionsExt,
   ): Promise<UpdatePoetServerResponse>;
   /** Node status events (sync and net) */
   statusStream(
     request: DeepPartial<StatusStreamRequest>,
-    options?: CallOptions & CallOptionsExt
+    options?: CallOptions & CallOptionsExt,
   ): AsyncIterable<StatusStreamResponse>;
   /** Node error events */
   errorStream(
     request: DeepPartial<ErrorStreamRequest>,
-    options?: CallOptions & CallOptionsExt
+    options?: CallOptions & CallOptionsExt,
   ): AsyncIterable<ErrorStreamResponse>;
 }
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-export type DeepPartial<T> = T extends Builtin
-  ? T
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
+export type DeepPartial<T> = T extends Builtin ? T
+  : T extends Long ? string | number | Long : T extends Array<infer U> ? Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
-export type ServerStreamingMethodResult<Response> = {
-  [Symbol.asyncIterator](): AsyncIterator<Response, void>;
-};
+if (_m0.util.Long !== Long) {
+  _m0.util.Long = Long as any;
+  _m0.configure();
+}
+
+export type ServerStreamingMethodResult<Response> = { [Symbol.asyncIterator](): AsyncIterator<Response, void> };

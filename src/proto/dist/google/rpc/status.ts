@@ -1,6 +1,7 @@
 /* eslint-disable */
-import { Any } from "../protobuf/any";
+import Long from "long";
 import _m0 from "protobufjs/minimal";
+import { Any } from "../protobuf/any";
 
 export const protobufPackage = "google.rpc";
 
@@ -34,10 +35,7 @@ function createBaseStatus(): Status {
 }
 
 export const Status = {
-  encode(
-    message: Status,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: Status, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.code !== 0) {
       writer.uint32(8).int32(message.code);
     }
@@ -78,9 +76,7 @@ export const Status = {
     return {
       code: isSet(object.code) ? Number(object.code) : 0,
       message: isSet(object.message) ? String(object.message) : "",
-      details: Array.isArray(object?.details)
-        ? object.details.map((e: any) => Any.fromJSON(e))
-        : [],
+      details: Array.isArray(object?.details) ? object.details.map((e: any) => Any.fromJSON(e)) : [],
     };
   },
 
@@ -89,14 +85,14 @@ export const Status = {
     message.code !== undefined && (obj.code = Math.round(message.code));
     message.message !== undefined && (obj.message = message.message);
     if (message.details) {
-      obj.details = message.details.map((e) => (e ? Any.toJSON(e) : undefined));
+      obj.details = message.details.map((e) => e ? Any.toJSON(e) : undefined);
     } else {
       obj.details = [];
     }
     return obj;
   },
 
-  fromPartial(object: DeepPartial<Status>): Status {
+  fromPartial<I extends Exact<DeepPartial<Status>, I>>(object: I): Status {
     const message = createBaseStatus();
     message.code = object.code ?? 0;
     message.message = object.message ?? "";
@@ -105,24 +101,22 @@ export const Status = {
   },
 };
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-export type DeepPartial<T> = T extends Builtin
-  ? T
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
+export type DeepPartial<T> = T extends Builtin ? T
+  : T extends Long ? string | number | Long : T extends Array<infer U> ? Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
+
+type KeysOfUnion<T> = T extends T ? keyof T : never;
+export type Exact<P, I extends P> = P extends Builtin ? P
+  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
+
+if (_m0.util.Long !== Long) {
+  _m0.util.Long = Long as any;
+  _m0.configure();
+}
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;

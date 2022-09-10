@@ -7,17 +7,17 @@ import {
 import {
   GlobalStateServiceClient,
   GlobalStateServiceDefinition,
-} from "./proto/gen/spacemesh/v1/global_state";
+} from "./proto/dist/spacemesh/v1/global_state";
 import {
   AccountDataFilter,
   AccountDataFlag,
   AccountDataQueryRequest,
-} from "./proto/gen/spacemesh/v1/global_state_types";
+} from "./proto/dist/spacemesh/v1/global_state_types";
 import {
   TransactionServiceClient,
   TransactionServiceDefinition,
-} from "./proto/gen/spacemesh/v1/tx";
-import { AccountId } from "./proto/gen/spacemesh/v1/types";
+} from "./proto/dist/spacemesh/v1/tx";
+import { AccountId } from "./proto/dist/spacemesh/v1/types";
 import { mnemonicToSeedSync } from "bip39";
 import { signTransaction, toHexString } from "./util";
 import { Message } from "discord.js";
@@ -126,7 +126,7 @@ async function sendSmesh({
     channel
   );
 
-  const accountQueryId: AccountId = { address: publicKey };
+  const accountQueryId: AccountId = { address: "0x" + toHexString(publicKey) };
 
   const accountQueryFilter: AccountDataFilter = {
     accountId: accountQueryId,
@@ -143,7 +143,7 @@ async function sendSmesh({
     .accountDataQuery(accountQuery)
     .then(async (result) => {
       let senderAccountNonce =
-        result.accountItem[0].accountWrapper?.stateProjected?.counter;
+        result.accountItem[0].accountWrapper?.stateProjected?.counter.toNumber();
 
       let tx = await signTransaction({
         accountNonce: senderAccountNonce ?? 0,
@@ -165,6 +165,7 @@ async function sendSmesh({
         .then((result) => {
           if (result.status?.code == 0) {
             message.reply(`just 💸  transferred funds to ${message.content}`);
+            console.log(`just 💸  transferred funds to ${message.content}`);
           } else message.reply(`could not transfer :(`);
         })
         .catch((e) => {

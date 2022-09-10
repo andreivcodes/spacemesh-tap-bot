@@ -1,8 +1,8 @@
 /* eslint-disable */
 import Long from "long";
-import { AccountId, SimpleInt, Amount } from "./types";
-import { Status } from "../../google/rpc/status";
 import _m0 from "protobufjs/minimal";
+import { Status } from "../../google/rpc/status";
+import { AccountId, Amount, SimpleInt } from "./types";
 
 export const protobufPackage = "spacemesh.v1";
 
@@ -12,7 +12,9 @@ export interface IsSmeshingResponse {
 
 export interface StartSmeshingRequest {
   /** Coinbase account for rewards accumulation. */
-  coinbase: AccountId | undefined;
+  coinbase:
+    | AccountId
+    | undefined;
   /** The Post setup options. */
   opts: PostSetupOpts | undefined;
 }
@@ -58,7 +60,8 @@ export interface CoinbaseResponse {
   accountId: AccountId | undefined;
 }
 
-export interface EstimatedRewardsRequest {}
+export interface EstimatedRewardsRequest {
+}
 
 /**
  * Estimated rewards for the next epoch. Note that this is a global value that will be the
@@ -67,7 +70,9 @@ export interface EstimatedRewardsRequest {}
  */
 export interface EstimatedRewardsResponse {
   /** The amount of the total estimated reward in the next upcoming epoch */
-  amount: Amount | undefined;
+  amount:
+    | Amount
+    | undefined;
   /** The number of Post data commitment units that this estimated reward corresponds to (part of global config) */
   numUnits: number;
 }
@@ -91,7 +96,7 @@ export interface PostSetupStatusStreamResponse {
 
 export interface PostConfigResponse {
   bitsPerLabel: number;
-  labelsPerUnit: number;
+  labelsPerUnit: Long;
   minNumUnits: number;
   maxNumUnits: number;
 }
@@ -104,7 +109,7 @@ export interface PostSetupComputeProvider {
   /** A provided compute api */
   computeApi: PostSetupComputeProvider_ComputeApiClass;
   /** Estimated performance in hashes per second */
-  performance: number;
+  performance: Long;
 }
 
 export enum PostSetupComputeProvider_ComputeApiClass {
@@ -117,7 +122,7 @@ export enum PostSetupComputeProvider_ComputeApiClass {
 }
 
 export function postSetupComputeProvider_ComputeApiClassFromJSON(
-  object: any
+  object: any,
 ): PostSetupComputeProvider_ComputeApiClass {
   switch (object) {
     case 0:
@@ -140,7 +145,7 @@ export function postSetupComputeProvider_ComputeApiClassFromJSON(
 }
 
 export function postSetupComputeProvider_ComputeApiClassToJSON(
-  object: PostSetupComputeProvider_ComputeApiClass
+  object: PostSetupComputeProvider_ComputeApiClass,
 ): string {
   switch (object) {
     case PostSetupComputeProvider_ComputeApiClass.COMPUTE_API_CLASS_UNSPECIFIED:
@@ -174,9 +179,11 @@ export interface PostSetupOpts {
 export interface PostSetupStatus {
   state: PostSetupStatus_State;
   /** Number of labels (hashes) written to the data files */
-  numLabelsWritten: number;
+  numLabelsWritten: Long;
   /** setup options previously set by the user */
-  opts: PostSetupOpts | undefined;
+  opts:
+    | PostSetupOpts
+    | undefined;
   /** The error message, if the state is STATE_ERROR */
   errorMessage: string;
 }
@@ -195,9 +202,7 @@ export enum PostSetupStatus_State {
   UNRECOGNIZED = -1,
 }
 
-export function postSetupStatus_StateFromJSON(
-  object: any
-): PostSetupStatus_State {
+export function postSetupStatus_StateFromJSON(object: any): PostSetupStatus_State {
   switch (object) {
     case 0:
     case "STATE_UNSPECIFIED":
@@ -221,9 +226,7 @@ export function postSetupStatus_StateFromJSON(
   }
 }
 
-export function postSetupStatus_StateToJSON(
-  object: PostSetupStatus_State
-): string {
+export function postSetupStatus_StateToJSON(object: PostSetupStatus_State): string {
   switch (object) {
     case PostSetupStatus_State.STATE_UNSPECIFIED:
       return "STATE_UNSPECIFIED";
@@ -246,10 +249,7 @@ function createBaseIsSmeshingResponse(): IsSmeshingResponse {
 }
 
 export const IsSmeshingResponse = {
-  encode(
-    message: IsSmeshingResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: IsSmeshingResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.isSmeshing === true) {
       writer.uint32(8).bool(message.isSmeshing);
     }
@@ -275,9 +275,7 @@ export const IsSmeshingResponse = {
   },
 
   fromJSON(object: any): IsSmeshingResponse {
-    return {
-      isSmeshing: isSet(object.isSmeshing) ? Boolean(object.isSmeshing) : false,
-    };
+    return { isSmeshing: isSet(object.isSmeshing) ? Boolean(object.isSmeshing) : false };
   },
 
   toJSON(message: IsSmeshingResponse): unknown {
@@ -286,7 +284,7 @@ export const IsSmeshingResponse = {
     return obj;
   },
 
-  fromPartial(object: DeepPartial<IsSmeshingResponse>): IsSmeshingResponse {
+  fromPartial<I extends Exact<DeepPartial<IsSmeshingResponse>, I>>(object: I): IsSmeshingResponse {
     const message = createBaseIsSmeshingResponse();
     message.isSmeshing = object.isSmeshing ?? false;
     return message;
@@ -298,10 +296,7 @@ function createBaseStartSmeshingRequest(): StartSmeshingRequest {
 }
 
 export const StartSmeshingRequest = {
-  encode(
-    message: StartSmeshingRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: StartSmeshingRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.coinbase !== undefined) {
       AccountId.encode(message.coinbase, writer.uint32(10).fork()).ldelim();
     }
@@ -311,10 +306,7 @@ export const StartSmeshingRequest = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): StartSmeshingRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): StartSmeshingRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseStartSmeshingRequest();
@@ -337,38 +329,27 @@ export const StartSmeshingRequest = {
 
   fromJSON(object: any): StartSmeshingRequest {
     return {
-      coinbase: isSet(object.coinbase)
-        ? AccountId.fromJSON(object.coinbase)
-        : undefined,
-      opts: isSet(object.opts)
-        ? PostSetupOpts.fromJSON(object.opts)
-        : undefined,
+      coinbase: isSet(object.coinbase) ? AccountId.fromJSON(object.coinbase) : undefined,
+      opts: isSet(object.opts) ? PostSetupOpts.fromJSON(object.opts) : undefined,
     };
   },
 
   toJSON(message: StartSmeshingRequest): unknown {
     const obj: any = {};
     message.coinbase !== undefined &&
-      (obj.coinbase = message.coinbase
-        ? AccountId.toJSON(message.coinbase)
-        : undefined);
-    message.opts !== undefined &&
-      (obj.opts = message.opts
-        ? PostSetupOpts.toJSON(message.opts)
-        : undefined);
+      (obj.coinbase = message.coinbase ? AccountId.toJSON(message.coinbase) : undefined);
+    message.opts !== undefined && (obj.opts = message.opts ? PostSetupOpts.toJSON(message.opts) : undefined);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<StartSmeshingRequest>): StartSmeshingRequest {
+  fromPartial<I extends Exact<DeepPartial<StartSmeshingRequest>, I>>(object: I): StartSmeshingRequest {
     const message = createBaseStartSmeshingRequest();
-    message.coinbase =
-      object.coinbase !== undefined && object.coinbase !== null
-        ? AccountId.fromPartial(object.coinbase)
-        : undefined;
-    message.opts =
-      object.opts !== undefined && object.opts !== null
-        ? PostSetupOpts.fromPartial(object.opts)
-        : undefined;
+    message.coinbase = (object.coinbase !== undefined && object.coinbase !== null)
+      ? AccountId.fromPartial(object.coinbase)
+      : undefined;
+    message.opts = (object.opts !== undefined && object.opts !== null)
+      ? PostSetupOpts.fromPartial(object.opts)
+      : undefined;
     return message;
   },
 };
@@ -378,20 +359,14 @@ function createBaseStartSmeshingResponse(): StartSmeshingResponse {
 }
 
 export const StartSmeshingResponse = {
-  encode(
-    message: StartSmeshingResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: StartSmeshingResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.status !== undefined) {
       Status.encode(message.status, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): StartSmeshingResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): StartSmeshingResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseStartSmeshingResponse();
@@ -410,26 +385,20 @@ export const StartSmeshingResponse = {
   },
 
   fromJSON(object: any): StartSmeshingResponse {
-    return {
-      status: isSet(object.status) ? Status.fromJSON(object.status) : undefined,
-    };
+    return { status: isSet(object.status) ? Status.fromJSON(object.status) : undefined };
   },
 
   toJSON(message: StartSmeshingResponse): unknown {
     const obj: any = {};
-    message.status !== undefined &&
-      (obj.status = message.status ? Status.toJSON(message.status) : undefined);
+    message.status !== undefined && (obj.status = message.status ? Status.toJSON(message.status) : undefined);
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<StartSmeshingResponse>
-  ): StartSmeshingResponse {
+  fromPartial<I extends Exact<DeepPartial<StartSmeshingResponse>, I>>(object: I): StartSmeshingResponse {
     const message = createBaseStartSmeshingResponse();
-    message.status =
-      object.status !== undefined && object.status !== null
-        ? Status.fromPartial(object.status)
-        : undefined;
+    message.status = (object.status !== undefined && object.status !== null)
+      ? Status.fromPartial(object.status)
+      : undefined;
     return message;
   },
 };
@@ -439,10 +408,7 @@ function createBaseStopSmeshingRequest(): StopSmeshingRequest {
 }
 
 export const StopSmeshingRequest = {
-  encode(
-    message: StopSmeshingRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: StopSmeshingRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.deleteFiles === true) {
       writer.uint32(8).bool(message.deleteFiles);
     }
@@ -468,21 +434,16 @@ export const StopSmeshingRequest = {
   },
 
   fromJSON(object: any): StopSmeshingRequest {
-    return {
-      deleteFiles: isSet(object.deleteFiles)
-        ? Boolean(object.deleteFiles)
-        : false,
-    };
+    return { deleteFiles: isSet(object.deleteFiles) ? Boolean(object.deleteFiles) : false };
   },
 
   toJSON(message: StopSmeshingRequest): unknown {
     const obj: any = {};
-    message.deleteFiles !== undefined &&
-      (obj.deleteFiles = message.deleteFiles);
+    message.deleteFiles !== undefined && (obj.deleteFiles = message.deleteFiles);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<StopSmeshingRequest>): StopSmeshingRequest {
+  fromPartial<I extends Exact<DeepPartial<StopSmeshingRequest>, I>>(object: I): StopSmeshingRequest {
     const message = createBaseStopSmeshingRequest();
     message.deleteFiles = object.deleteFiles ?? false;
     return message;
@@ -494,20 +455,14 @@ function createBaseStopSmeshingResponse(): StopSmeshingResponse {
 }
 
 export const StopSmeshingResponse = {
-  encode(
-    message: StopSmeshingResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: StopSmeshingResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.status !== undefined) {
       Status.encode(message.status, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): StopSmeshingResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): StopSmeshingResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseStopSmeshingResponse();
@@ -526,24 +481,20 @@ export const StopSmeshingResponse = {
   },
 
   fromJSON(object: any): StopSmeshingResponse {
-    return {
-      status: isSet(object.status) ? Status.fromJSON(object.status) : undefined,
-    };
+    return { status: isSet(object.status) ? Status.fromJSON(object.status) : undefined };
   },
 
   toJSON(message: StopSmeshingResponse): unknown {
     const obj: any = {};
-    message.status !== undefined &&
-      (obj.status = message.status ? Status.toJSON(message.status) : undefined);
+    message.status !== undefined && (obj.status = message.status ? Status.toJSON(message.status) : undefined);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<StopSmeshingResponse>): StopSmeshingResponse {
+  fromPartial<I extends Exact<DeepPartial<StopSmeshingResponse>, I>>(object: I): StopSmeshingResponse {
     const message = createBaseStopSmeshingResponse();
-    message.status =
-      object.status !== undefined && object.status !== null
-        ? Status.fromPartial(object.status)
-        : undefined;
+    message.status = (object.status !== undefined && object.status !== null)
+      ? Status.fromPartial(object.status)
+      : undefined;
     return message;
   },
 };
@@ -553,10 +504,7 @@ function createBaseSetCoinbaseRequest(): SetCoinbaseRequest {
 }
 
 export const SetCoinbaseRequest = {
-  encode(
-    message: SetCoinbaseRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: SetCoinbaseRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.id !== undefined) {
       AccountId.encode(message.id, writer.uint32(10).fork()).ldelim();
     }
@@ -582,24 +530,18 @@ export const SetCoinbaseRequest = {
   },
 
   fromJSON(object: any): SetCoinbaseRequest {
-    return {
-      id: isSet(object.id) ? AccountId.fromJSON(object.id) : undefined,
-    };
+    return { id: isSet(object.id) ? AccountId.fromJSON(object.id) : undefined };
   },
 
   toJSON(message: SetCoinbaseRequest): unknown {
     const obj: any = {};
-    message.id !== undefined &&
-      (obj.id = message.id ? AccountId.toJSON(message.id) : undefined);
+    message.id !== undefined && (obj.id = message.id ? AccountId.toJSON(message.id) : undefined);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<SetCoinbaseRequest>): SetCoinbaseRequest {
+  fromPartial<I extends Exact<DeepPartial<SetCoinbaseRequest>, I>>(object: I): SetCoinbaseRequest {
     const message = createBaseSetCoinbaseRequest();
-    message.id =
-      object.id !== undefined && object.id !== null
-        ? AccountId.fromPartial(object.id)
-        : undefined;
+    message.id = (object.id !== undefined && object.id !== null) ? AccountId.fromPartial(object.id) : undefined;
     return message;
   },
 };
@@ -609,10 +551,7 @@ function createBaseSetCoinbaseResponse(): SetCoinbaseResponse {
 }
 
 export const SetCoinbaseResponse = {
-  encode(
-    message: SetCoinbaseResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: SetCoinbaseResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.status !== undefined) {
       Status.encode(message.status, writer.uint32(10).fork()).ldelim();
     }
@@ -638,24 +577,20 @@ export const SetCoinbaseResponse = {
   },
 
   fromJSON(object: any): SetCoinbaseResponse {
-    return {
-      status: isSet(object.status) ? Status.fromJSON(object.status) : undefined,
-    };
+    return { status: isSet(object.status) ? Status.fromJSON(object.status) : undefined };
   },
 
   toJSON(message: SetCoinbaseResponse): unknown {
     const obj: any = {};
-    message.status !== undefined &&
-      (obj.status = message.status ? Status.toJSON(message.status) : undefined);
+    message.status !== undefined && (obj.status = message.status ? Status.toJSON(message.status) : undefined);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<SetCoinbaseResponse>): SetCoinbaseResponse {
+  fromPartial<I extends Exact<DeepPartial<SetCoinbaseResponse>, I>>(object: I): SetCoinbaseResponse {
     const message = createBaseSetCoinbaseResponse();
-    message.status =
-      object.status !== undefined && object.status !== null
-        ? Status.fromPartial(object.status)
-        : undefined;
+    message.status = (object.status !== undefined && object.status !== null)
+      ? Status.fromPartial(object.status)
+      : undefined;
     return message;
   },
 };
@@ -665,10 +600,7 @@ function createBaseMinGasResponse(): MinGasResponse {
 }
 
 export const MinGasResponse = {
-  encode(
-    message: MinGasResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: MinGasResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.mingas !== undefined) {
       SimpleInt.encode(message.mingas, writer.uint32(10).fork()).ldelim();
     }
@@ -694,28 +626,20 @@ export const MinGasResponse = {
   },
 
   fromJSON(object: any): MinGasResponse {
-    return {
-      mingas: isSet(object.mingas)
-        ? SimpleInt.fromJSON(object.mingas)
-        : undefined,
-    };
+    return { mingas: isSet(object.mingas) ? SimpleInt.fromJSON(object.mingas) : undefined };
   },
 
   toJSON(message: MinGasResponse): unknown {
     const obj: any = {};
-    message.mingas !== undefined &&
-      (obj.mingas = message.mingas
-        ? SimpleInt.toJSON(message.mingas)
-        : undefined);
+    message.mingas !== undefined && (obj.mingas = message.mingas ? SimpleInt.toJSON(message.mingas) : undefined);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<MinGasResponse>): MinGasResponse {
+  fromPartial<I extends Exact<DeepPartial<MinGasResponse>, I>>(object: I): MinGasResponse {
     const message = createBaseMinGasResponse();
-    message.mingas =
-      object.mingas !== undefined && object.mingas !== null
-        ? SimpleInt.fromPartial(object.mingas)
-        : undefined;
+    message.mingas = (object.mingas !== undefined && object.mingas !== null)
+      ? SimpleInt.fromPartial(object.mingas)
+      : undefined;
     return message;
   },
 };
@@ -725,10 +649,7 @@ function createBaseSetMinGasRequest(): SetMinGasRequest {
 }
 
 export const SetMinGasRequest = {
-  encode(
-    message: SetMinGasRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: SetMinGasRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.mingas !== undefined) {
       SimpleInt.encode(message.mingas, writer.uint32(10).fork()).ldelim();
     }
@@ -754,28 +675,20 @@ export const SetMinGasRequest = {
   },
 
   fromJSON(object: any): SetMinGasRequest {
-    return {
-      mingas: isSet(object.mingas)
-        ? SimpleInt.fromJSON(object.mingas)
-        : undefined,
-    };
+    return { mingas: isSet(object.mingas) ? SimpleInt.fromJSON(object.mingas) : undefined };
   },
 
   toJSON(message: SetMinGasRequest): unknown {
     const obj: any = {};
-    message.mingas !== undefined &&
-      (obj.mingas = message.mingas
-        ? SimpleInt.toJSON(message.mingas)
-        : undefined);
+    message.mingas !== undefined && (obj.mingas = message.mingas ? SimpleInt.toJSON(message.mingas) : undefined);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<SetMinGasRequest>): SetMinGasRequest {
+  fromPartial<I extends Exact<DeepPartial<SetMinGasRequest>, I>>(object: I): SetMinGasRequest {
     const message = createBaseSetMinGasRequest();
-    message.mingas =
-      object.mingas !== undefined && object.mingas !== null
-        ? SimpleInt.fromPartial(object.mingas)
-        : undefined;
+    message.mingas = (object.mingas !== undefined && object.mingas !== null)
+      ? SimpleInt.fromPartial(object.mingas)
+      : undefined;
     return message;
   },
 };
@@ -785,10 +698,7 @@ function createBaseSetMinGasResponse(): SetMinGasResponse {
 }
 
 export const SetMinGasResponse = {
-  encode(
-    message: SetMinGasResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: SetMinGasResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.status !== undefined) {
       Status.encode(message.status, writer.uint32(10).fork()).ldelim();
     }
@@ -814,24 +724,20 @@ export const SetMinGasResponse = {
   },
 
   fromJSON(object: any): SetMinGasResponse {
-    return {
-      status: isSet(object.status) ? Status.fromJSON(object.status) : undefined,
-    };
+    return { status: isSet(object.status) ? Status.fromJSON(object.status) : undefined };
   },
 
   toJSON(message: SetMinGasResponse): unknown {
     const obj: any = {};
-    message.status !== undefined &&
-      (obj.status = message.status ? Status.toJSON(message.status) : undefined);
+    message.status !== undefined && (obj.status = message.status ? Status.toJSON(message.status) : undefined);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<SetMinGasResponse>): SetMinGasResponse {
+  fromPartial<I extends Exact<DeepPartial<SetMinGasResponse>, I>>(object: I): SetMinGasResponse {
     const message = createBaseSetMinGasResponse();
-    message.status =
-      object.status !== undefined && object.status !== null
-        ? Status.fromPartial(object.status)
-        : undefined;
+    message.status = (object.status !== undefined && object.status !== null)
+      ? Status.fromPartial(object.status)
+      : undefined;
     return message;
   },
 };
@@ -841,10 +747,7 @@ function createBaseSmesherIDResponse(): SmesherIDResponse {
 }
 
 export const SmesherIDResponse = {
-  encode(
-    message: SmesherIDResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: SmesherIDResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.accountId !== undefined) {
       AccountId.encode(message.accountId, writer.uint32(10).fork()).ldelim();
     }
@@ -870,28 +773,21 @@ export const SmesherIDResponse = {
   },
 
   fromJSON(object: any): SmesherIDResponse {
-    return {
-      accountId: isSet(object.accountId)
-        ? AccountId.fromJSON(object.accountId)
-        : undefined,
-    };
+    return { accountId: isSet(object.accountId) ? AccountId.fromJSON(object.accountId) : undefined };
   },
 
   toJSON(message: SmesherIDResponse): unknown {
     const obj: any = {};
     message.accountId !== undefined &&
-      (obj.accountId = message.accountId
-        ? AccountId.toJSON(message.accountId)
-        : undefined);
+      (obj.accountId = message.accountId ? AccountId.toJSON(message.accountId) : undefined);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<SmesherIDResponse>): SmesherIDResponse {
+  fromPartial<I extends Exact<DeepPartial<SmesherIDResponse>, I>>(object: I): SmesherIDResponse {
     const message = createBaseSmesherIDResponse();
-    message.accountId =
-      object.accountId !== undefined && object.accountId !== null
-        ? AccountId.fromPartial(object.accountId)
-        : undefined;
+    message.accountId = (object.accountId !== undefined && object.accountId !== null)
+      ? AccountId.fromPartial(object.accountId)
+      : undefined;
     return message;
   },
 };
@@ -901,10 +797,7 @@ function createBaseCoinbaseResponse(): CoinbaseResponse {
 }
 
 export const CoinbaseResponse = {
-  encode(
-    message: CoinbaseResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: CoinbaseResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.accountId !== undefined) {
       AccountId.encode(message.accountId, writer.uint32(10).fork()).ldelim();
     }
@@ -930,28 +823,21 @@ export const CoinbaseResponse = {
   },
 
   fromJSON(object: any): CoinbaseResponse {
-    return {
-      accountId: isSet(object.accountId)
-        ? AccountId.fromJSON(object.accountId)
-        : undefined,
-    };
+    return { accountId: isSet(object.accountId) ? AccountId.fromJSON(object.accountId) : undefined };
   },
 
   toJSON(message: CoinbaseResponse): unknown {
     const obj: any = {};
     message.accountId !== undefined &&
-      (obj.accountId = message.accountId
-        ? AccountId.toJSON(message.accountId)
-        : undefined);
+      (obj.accountId = message.accountId ? AccountId.toJSON(message.accountId) : undefined);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<CoinbaseResponse>): CoinbaseResponse {
+  fromPartial<I extends Exact<DeepPartial<CoinbaseResponse>, I>>(object: I): CoinbaseResponse {
     const message = createBaseCoinbaseResponse();
-    message.accountId =
-      object.accountId !== undefined && object.accountId !== null
-        ? AccountId.fromPartial(object.accountId)
-        : undefined;
+    message.accountId = (object.accountId !== undefined && object.accountId !== null)
+      ? AccountId.fromPartial(object.accountId)
+      : undefined;
     return message;
   },
 };
@@ -961,17 +847,11 @@ function createBaseEstimatedRewardsRequest(): EstimatedRewardsRequest {
 }
 
 export const EstimatedRewardsRequest = {
-  encode(
-    _: EstimatedRewardsRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(_: EstimatedRewardsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): EstimatedRewardsRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): EstimatedRewardsRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEstimatedRewardsRequest();
@@ -995,9 +875,7 @@ export const EstimatedRewardsRequest = {
     return obj;
   },
 
-  fromPartial(
-    _: DeepPartial<EstimatedRewardsRequest>
-  ): EstimatedRewardsRequest {
+  fromPartial<I extends Exact<DeepPartial<EstimatedRewardsRequest>, I>>(_: I): EstimatedRewardsRequest {
     const message = createBaseEstimatedRewardsRequest();
     return message;
   },
@@ -1008,10 +886,7 @@ function createBaseEstimatedRewardsResponse(): EstimatedRewardsResponse {
 }
 
 export const EstimatedRewardsResponse = {
-  encode(
-    message: EstimatedRewardsResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: EstimatedRewardsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.amount !== undefined) {
       Amount.encode(message.amount, writer.uint32(10).fork()).ldelim();
     }
@@ -1021,10 +896,7 @@ export const EstimatedRewardsResponse = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): EstimatedRewardsResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): EstimatedRewardsResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseEstimatedRewardsResponse();
@@ -1054,21 +926,16 @@ export const EstimatedRewardsResponse = {
 
   toJSON(message: EstimatedRewardsResponse): unknown {
     const obj: any = {};
-    message.amount !== undefined &&
-      (obj.amount = message.amount ? Amount.toJSON(message.amount) : undefined);
-    message.numUnits !== undefined &&
-      (obj.numUnits = Math.round(message.numUnits));
+    message.amount !== undefined && (obj.amount = message.amount ? Amount.toJSON(message.amount) : undefined);
+    message.numUnits !== undefined && (obj.numUnits = Math.round(message.numUnits));
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<EstimatedRewardsResponse>
-  ): EstimatedRewardsResponse {
+  fromPartial<I extends Exact<DeepPartial<EstimatedRewardsResponse>, I>>(object: I): EstimatedRewardsResponse {
     const message = createBaseEstimatedRewardsResponse();
-    message.amount =
-      object.amount !== undefined && object.amount !== null
-        ? Amount.fromPartial(object.amount)
-        : undefined;
+    message.amount = (object.amount !== undefined && object.amount !== null)
+      ? Amount.fromPartial(object.amount)
+      : undefined;
     message.numUnits = object.numUnits ?? 0;
     return message;
   },
@@ -1079,20 +946,14 @@ function createBasePostSetupComputeProvidersRequest(): PostSetupComputeProviders
 }
 
 export const PostSetupComputeProvidersRequest = {
-  encode(
-    message: PostSetupComputeProvidersRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: PostSetupComputeProvidersRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.benchmark === true) {
       writer.uint32(8).bool(message.benchmark);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): PostSetupComputeProvidersRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): PostSetupComputeProvidersRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePostSetupComputeProvidersRequest();
@@ -1111,9 +972,7 @@ export const PostSetupComputeProvidersRequest = {
   },
 
   fromJSON(object: any): PostSetupComputeProvidersRequest {
-    return {
-      benchmark: isSet(object.benchmark) ? Boolean(object.benchmark) : false,
-    };
+    return { benchmark: isSet(object.benchmark) ? Boolean(object.benchmark) : false };
   },
 
   toJSON(message: PostSetupComputeProvidersRequest): unknown {
@@ -1122,8 +981,8 @@ export const PostSetupComputeProvidersRequest = {
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<PostSetupComputeProvidersRequest>
+  fromPartial<I extends Exact<DeepPartial<PostSetupComputeProvidersRequest>, I>>(
+    object: I,
   ): PostSetupComputeProvidersRequest {
     const message = createBasePostSetupComputeProvidersRequest();
     message.benchmark = object.benchmark ?? false;
@@ -1136,20 +995,14 @@ function createBasePostSetupComputeProvidersResponse(): PostSetupComputeProvider
 }
 
 export const PostSetupComputeProvidersResponse = {
-  encode(
-    message: PostSetupComputeProvidersResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: PostSetupComputeProvidersResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.providers) {
       PostSetupComputeProvider.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): PostSetupComputeProvidersResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): PostSetupComputeProvidersResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePostSetupComputeProvidersResponse();
@@ -1157,9 +1010,7 @@ export const PostSetupComputeProvidersResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.providers.push(
-            PostSetupComputeProvider.decode(reader, reader.uint32())
-          );
+          message.providers.push(PostSetupComputeProvider.decode(reader, reader.uint32()));
           break;
         default:
           reader.skipType(tag & 7);
@@ -1180,22 +1031,18 @@ export const PostSetupComputeProvidersResponse = {
   toJSON(message: PostSetupComputeProvidersResponse): unknown {
     const obj: any = {};
     if (message.providers) {
-      obj.providers = message.providers.map((e) =>
-        e ? PostSetupComputeProvider.toJSON(e) : undefined
-      );
+      obj.providers = message.providers.map((e) => e ? PostSetupComputeProvider.toJSON(e) : undefined);
     } else {
       obj.providers = [];
     }
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<PostSetupComputeProvidersResponse>
+  fromPartial<I extends Exact<DeepPartial<PostSetupComputeProvidersResponse>, I>>(
+    object: I,
   ): PostSetupComputeProvidersResponse {
     const message = createBasePostSetupComputeProvidersResponse();
-    message.providers =
-      object.providers?.map((e) => PostSetupComputeProvider.fromPartial(e)) ||
-      [];
+    message.providers = object.providers?.map((e) => PostSetupComputeProvider.fromPartial(e)) || [];
     return message;
   },
 };
@@ -1205,20 +1052,14 @@ function createBasePostSetupStatusResponse(): PostSetupStatusResponse {
 }
 
 export const PostSetupStatusResponse = {
-  encode(
-    message: PostSetupStatusResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: PostSetupStatusResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.status !== undefined) {
       PostSetupStatus.encode(message.status, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): PostSetupStatusResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): PostSetupStatusResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePostSetupStatusResponse();
@@ -1237,30 +1078,20 @@ export const PostSetupStatusResponse = {
   },
 
   fromJSON(object: any): PostSetupStatusResponse {
-    return {
-      status: isSet(object.status)
-        ? PostSetupStatus.fromJSON(object.status)
-        : undefined,
-    };
+    return { status: isSet(object.status) ? PostSetupStatus.fromJSON(object.status) : undefined };
   },
 
   toJSON(message: PostSetupStatusResponse): unknown {
     const obj: any = {};
-    message.status !== undefined &&
-      (obj.status = message.status
-        ? PostSetupStatus.toJSON(message.status)
-        : undefined);
+    message.status !== undefined && (obj.status = message.status ? PostSetupStatus.toJSON(message.status) : undefined);
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<PostSetupStatusResponse>
-  ): PostSetupStatusResponse {
+  fromPartial<I extends Exact<DeepPartial<PostSetupStatusResponse>, I>>(object: I): PostSetupStatusResponse {
     const message = createBasePostSetupStatusResponse();
-    message.status =
-      object.status !== undefined && object.status !== null
-        ? PostSetupStatus.fromPartial(object.status)
-        : undefined;
+    message.status = (object.status !== undefined && object.status !== null)
+      ? PostSetupStatus.fromPartial(object.status)
+      : undefined;
     return message;
   },
 };
@@ -1270,20 +1101,14 @@ function createBasePostSetupStatusStreamResponse(): PostSetupStatusStreamRespons
 }
 
 export const PostSetupStatusStreamResponse = {
-  encode(
-    message: PostSetupStatusStreamResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: PostSetupStatusStreamResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.status !== undefined) {
       PostSetupStatus.encode(message.status, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): PostSetupStatusStreamResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): PostSetupStatusStreamResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePostSetupStatusStreamResponse();
@@ -1302,47 +1127,36 @@ export const PostSetupStatusStreamResponse = {
   },
 
   fromJSON(object: any): PostSetupStatusStreamResponse {
-    return {
-      status: isSet(object.status)
-        ? PostSetupStatus.fromJSON(object.status)
-        : undefined,
-    };
+    return { status: isSet(object.status) ? PostSetupStatus.fromJSON(object.status) : undefined };
   },
 
   toJSON(message: PostSetupStatusStreamResponse): unknown {
     const obj: any = {};
-    message.status !== undefined &&
-      (obj.status = message.status
-        ? PostSetupStatus.toJSON(message.status)
-        : undefined);
+    message.status !== undefined && (obj.status = message.status ? PostSetupStatus.toJSON(message.status) : undefined);
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<PostSetupStatusStreamResponse>
+  fromPartial<I extends Exact<DeepPartial<PostSetupStatusStreamResponse>, I>>(
+    object: I,
   ): PostSetupStatusStreamResponse {
     const message = createBasePostSetupStatusStreamResponse();
-    message.status =
-      object.status !== undefined && object.status !== null
-        ? PostSetupStatus.fromPartial(object.status)
-        : undefined;
+    message.status = (object.status !== undefined && object.status !== null)
+      ? PostSetupStatus.fromPartial(object.status)
+      : undefined;
     return message;
   },
 };
 
 function createBasePostConfigResponse(): PostConfigResponse {
-  return { bitsPerLabel: 0, labelsPerUnit: 0, minNumUnits: 0, maxNumUnits: 0 };
+  return { bitsPerLabel: 0, labelsPerUnit: Long.UZERO, minNumUnits: 0, maxNumUnits: 0 };
 }
 
 export const PostConfigResponse = {
-  encode(
-    message: PostConfigResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: PostConfigResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.bitsPerLabel !== 0) {
       writer.uint32(8).uint32(message.bitsPerLabel);
     }
-    if (message.labelsPerUnit !== 0) {
+    if (!message.labelsPerUnit.isZero()) {
       writer.uint32(16).uint64(message.labelsPerUnit);
     }
     if (message.minNumUnits !== 0) {
@@ -1365,7 +1179,7 @@ export const PostConfigResponse = {
           message.bitsPerLabel = reader.uint32();
           break;
         case 2:
-          message.labelsPerUnit = longToNumber(reader.uint64() as Long);
+          message.labelsPerUnit = reader.uint64() as Long;
           break;
         case 3:
           message.minNumUnits = reader.uint32();
@@ -1383,12 +1197,8 @@ export const PostConfigResponse = {
 
   fromJSON(object: any): PostConfigResponse {
     return {
-      bitsPerLabel: isSet(object.bitsPerLabel)
-        ? Number(object.bitsPerLabel)
-        : 0,
-      labelsPerUnit: isSet(object.labelsPerUnit)
-        ? Number(object.labelsPerUnit)
-        : 0,
+      bitsPerLabel: isSet(object.bitsPerLabel) ? Number(object.bitsPerLabel) : 0,
+      labelsPerUnit: isSet(object.labelsPerUnit) ? Long.fromValue(object.labelsPerUnit) : Long.UZERO,
       minNumUnits: isSet(object.minNumUnits) ? Number(object.minNumUnits) : 0,
       maxNumUnits: isSet(object.maxNumUnits) ? Number(object.maxNumUnits) : 0,
     };
@@ -1396,21 +1206,19 @@ export const PostConfigResponse = {
 
   toJSON(message: PostConfigResponse): unknown {
     const obj: any = {};
-    message.bitsPerLabel !== undefined &&
-      (obj.bitsPerLabel = Math.round(message.bitsPerLabel));
-    message.labelsPerUnit !== undefined &&
-      (obj.labelsPerUnit = Math.round(message.labelsPerUnit));
-    message.minNumUnits !== undefined &&
-      (obj.minNumUnits = Math.round(message.minNumUnits));
-    message.maxNumUnits !== undefined &&
-      (obj.maxNumUnits = Math.round(message.maxNumUnits));
+    message.bitsPerLabel !== undefined && (obj.bitsPerLabel = Math.round(message.bitsPerLabel));
+    message.labelsPerUnit !== undefined && (obj.labelsPerUnit = (message.labelsPerUnit || Long.UZERO).toString());
+    message.minNumUnits !== undefined && (obj.minNumUnits = Math.round(message.minNumUnits));
+    message.maxNumUnits !== undefined && (obj.maxNumUnits = Math.round(message.maxNumUnits));
     return obj;
   },
 
-  fromPartial(object: DeepPartial<PostConfigResponse>): PostConfigResponse {
+  fromPartial<I extends Exact<DeepPartial<PostConfigResponse>, I>>(object: I): PostConfigResponse {
     const message = createBasePostConfigResponse();
     message.bitsPerLabel = object.bitsPerLabel ?? 0;
-    message.labelsPerUnit = object.labelsPerUnit ?? 0;
+    message.labelsPerUnit = (object.labelsPerUnit !== undefined && object.labelsPerUnit !== null)
+      ? Long.fromValue(object.labelsPerUnit)
+      : Long.UZERO;
     message.minNumUnits = object.minNumUnits ?? 0;
     message.maxNumUnits = object.maxNumUnits ?? 0;
     return message;
@@ -1418,14 +1226,11 @@ export const PostConfigResponse = {
 };
 
 function createBasePostSetupComputeProvider(): PostSetupComputeProvider {
-  return { id: 0, model: "", computeApi: 0, performance: 0 };
+  return { id: 0, model: "", computeApi: 0, performance: Long.UZERO };
 }
 
 export const PostSetupComputeProvider = {
-  encode(
-    message: PostSetupComputeProvider,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: PostSetupComputeProvider, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.id !== 0) {
       writer.uint32(8).uint32(message.id);
     }
@@ -1435,16 +1240,13 @@ export const PostSetupComputeProvider = {
     if (message.computeApi !== 0) {
       writer.uint32(24).int32(message.computeApi);
     }
-    if (message.performance !== 0) {
+    if (!message.performance.isZero()) {
       writer.uint32(32).uint64(message.performance);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): PostSetupComputeProvider {
+  decode(input: _m0.Reader | Uint8Array, length?: number): PostSetupComputeProvider {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBasePostSetupComputeProvider();
@@ -1461,7 +1263,7 @@ export const PostSetupComputeProvider = {
           message.computeApi = reader.int32() as any;
           break;
         case 4:
-          message.performance = longToNumber(reader.uint64() as Long);
+          message.performance = reader.uint64() as Long;
           break;
         default:
           reader.skipType(tag & 7);
@@ -1475,10 +1277,8 @@ export const PostSetupComputeProvider = {
     return {
       id: isSet(object.id) ? Number(object.id) : 0,
       model: isSet(object.model) ? String(object.model) : "",
-      computeApi: isSet(object.computeApi)
-        ? postSetupComputeProvider_ComputeApiClassFromJSON(object.computeApi)
-        : 0,
-      performance: isSet(object.performance) ? Number(object.performance) : 0,
+      computeApi: isSet(object.computeApi) ? postSetupComputeProvider_ComputeApiClassFromJSON(object.computeApi) : 0,
+      performance: isSet(object.performance) ? Long.fromValue(object.performance) : Long.UZERO,
     };
   },
 
@@ -1487,41 +1287,29 @@ export const PostSetupComputeProvider = {
     message.id !== undefined && (obj.id = Math.round(message.id));
     message.model !== undefined && (obj.model = message.model);
     message.computeApi !== undefined &&
-      (obj.computeApi = postSetupComputeProvider_ComputeApiClassToJSON(
-        message.computeApi
-      ));
-    message.performance !== undefined &&
-      (obj.performance = Math.round(message.performance));
+      (obj.computeApi = postSetupComputeProvider_ComputeApiClassToJSON(message.computeApi));
+    message.performance !== undefined && (obj.performance = (message.performance || Long.UZERO).toString());
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<PostSetupComputeProvider>
-  ): PostSetupComputeProvider {
+  fromPartial<I extends Exact<DeepPartial<PostSetupComputeProvider>, I>>(object: I): PostSetupComputeProvider {
     const message = createBasePostSetupComputeProvider();
     message.id = object.id ?? 0;
     message.model = object.model ?? "";
     message.computeApi = object.computeApi ?? 0;
-    message.performance = object.performance ?? 0;
+    message.performance = (object.performance !== undefined && object.performance !== null)
+      ? Long.fromValue(object.performance)
+      : Long.UZERO;
     return message;
   },
 };
 
 function createBasePostSetupOpts(): PostSetupOpts {
-  return {
-    dataDir: "",
-    numUnits: 0,
-    numFiles: 0,
-    computeProviderId: 0,
-    throttle: false,
-  };
+  return { dataDir: "", numUnits: 0, numFiles: 0, computeProviderId: 0, throttle: false };
 }
 
 export const PostSetupOpts = {
-  encode(
-    message: PostSetupOpts,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: PostSetupOpts, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.dataDir !== "") {
       writer.uint32(10).string(message.dataDir);
     }
@@ -1575,9 +1363,7 @@ export const PostSetupOpts = {
       dataDir: isSet(object.dataDir) ? String(object.dataDir) : "",
       numUnits: isSet(object.numUnits) ? Number(object.numUnits) : 0,
       numFiles: isSet(object.numFiles) ? Number(object.numFiles) : 0,
-      computeProviderId: isSet(object.computeProviderId)
-        ? Number(object.computeProviderId)
-        : 0,
+      computeProviderId: isSet(object.computeProviderId) ? Number(object.computeProviderId) : 0,
       throttle: isSet(object.throttle) ? Boolean(object.throttle) : false,
     };
   },
@@ -1585,17 +1371,14 @@ export const PostSetupOpts = {
   toJSON(message: PostSetupOpts): unknown {
     const obj: any = {};
     message.dataDir !== undefined && (obj.dataDir = message.dataDir);
-    message.numUnits !== undefined &&
-      (obj.numUnits = Math.round(message.numUnits));
-    message.numFiles !== undefined &&
-      (obj.numFiles = Math.round(message.numFiles));
-    message.computeProviderId !== undefined &&
-      (obj.computeProviderId = Math.round(message.computeProviderId));
+    message.numUnits !== undefined && (obj.numUnits = Math.round(message.numUnits));
+    message.numFiles !== undefined && (obj.numFiles = Math.round(message.numFiles));
+    message.computeProviderId !== undefined && (obj.computeProviderId = Math.round(message.computeProviderId));
     message.throttle !== undefined && (obj.throttle = message.throttle);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<PostSetupOpts>): PostSetupOpts {
+  fromPartial<I extends Exact<DeepPartial<PostSetupOpts>, I>>(object: I): PostSetupOpts {
     const message = createBasePostSetupOpts();
     message.dataDir = object.dataDir ?? "";
     message.numUnits = object.numUnits ?? 0;
@@ -1607,18 +1390,15 @@ export const PostSetupOpts = {
 };
 
 function createBasePostSetupStatus(): PostSetupStatus {
-  return { state: 0, numLabelsWritten: 0, opts: undefined, errorMessage: "" };
+  return { state: 0, numLabelsWritten: Long.UZERO, opts: undefined, errorMessage: "" };
 }
 
 export const PostSetupStatus = {
-  encode(
-    message: PostSetupStatus,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: PostSetupStatus, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.state !== 0) {
       writer.uint32(8).int32(message.state);
     }
-    if (message.numLabelsWritten !== 0) {
+    if (!message.numLabelsWritten.isZero()) {
       writer.uint32(16).uint64(message.numLabelsWritten);
     }
     if (message.opts !== undefined) {
@@ -1641,7 +1421,7 @@ export const PostSetupStatus = {
           message.state = reader.int32() as any;
           break;
         case 2:
-          message.numLabelsWritten = longToNumber(reader.uint64() as Long);
+          message.numLabelsWritten = reader.uint64() as Long;
           break;
         case 3:
           message.opts = PostSetupOpts.decode(reader, reader.uint32());
@@ -1659,85 +1439,48 @@ export const PostSetupStatus = {
 
   fromJSON(object: any): PostSetupStatus {
     return {
-      state: isSet(object.state)
-        ? postSetupStatus_StateFromJSON(object.state)
-        : 0,
-      numLabelsWritten: isSet(object.numLabelsWritten)
-        ? Number(object.numLabelsWritten)
-        : 0,
-      opts: isSet(object.opts)
-        ? PostSetupOpts.fromJSON(object.opts)
-        : undefined,
-      errorMessage: isSet(object.errorMessage)
-        ? String(object.errorMessage)
-        : "",
+      state: isSet(object.state) ? postSetupStatus_StateFromJSON(object.state) : 0,
+      numLabelsWritten: isSet(object.numLabelsWritten) ? Long.fromValue(object.numLabelsWritten) : Long.UZERO,
+      opts: isSet(object.opts) ? PostSetupOpts.fromJSON(object.opts) : undefined,
+      errorMessage: isSet(object.errorMessage) ? String(object.errorMessage) : "",
     };
   },
 
   toJSON(message: PostSetupStatus): unknown {
     const obj: any = {};
-    message.state !== undefined &&
-      (obj.state = postSetupStatus_StateToJSON(message.state));
+    message.state !== undefined && (obj.state = postSetupStatus_StateToJSON(message.state));
     message.numLabelsWritten !== undefined &&
-      (obj.numLabelsWritten = Math.round(message.numLabelsWritten));
-    message.opts !== undefined &&
-      (obj.opts = message.opts
-        ? PostSetupOpts.toJSON(message.opts)
-        : undefined);
-    message.errorMessage !== undefined &&
-      (obj.errorMessage = message.errorMessage);
+      (obj.numLabelsWritten = (message.numLabelsWritten || Long.UZERO).toString());
+    message.opts !== undefined && (obj.opts = message.opts ? PostSetupOpts.toJSON(message.opts) : undefined);
+    message.errorMessage !== undefined && (obj.errorMessage = message.errorMessage);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<PostSetupStatus>): PostSetupStatus {
+  fromPartial<I extends Exact<DeepPartial<PostSetupStatus>, I>>(object: I): PostSetupStatus {
     const message = createBasePostSetupStatus();
     message.state = object.state ?? 0;
-    message.numLabelsWritten = object.numLabelsWritten ?? 0;
-    message.opts =
-      object.opts !== undefined && object.opts !== null
-        ? PostSetupOpts.fromPartial(object.opts)
-        : undefined;
+    message.numLabelsWritten = (object.numLabelsWritten !== undefined && object.numLabelsWritten !== null)
+      ? Long.fromValue(object.numLabelsWritten)
+      : Long.UZERO;
+    message.opts = (object.opts !== undefined && object.opts !== null)
+      ? PostSetupOpts.fromPartial(object.opts)
+      : undefined;
     message.errorMessage = object.errorMessage ?? "";
     return message;
   },
 };
 
-declare var self: any | undefined;
-declare var window: any | undefined;
-declare var global: any | undefined;
-var globalThis: any = (() => {
-  if (typeof globalThis !== "undefined") return globalThis;
-  if (typeof self !== "undefined") return self;
-  if (typeof window !== "undefined") return window;
-  if (typeof global !== "undefined") return global;
-  throw "Unable to locate global object";
-})();
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
-
-export type DeepPartial<T> = T extends Builtin
-  ? T
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
+export type DeepPartial<T> = T extends Builtin ? T
+  : T extends Long ? string | number | Long : T extends Array<infer U> ? Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
-function longToNumber(long: Long): number {
-  if (long.gt(Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  return long.toNumber();
-}
+type KeysOfUnion<T> = T extends T ? keyof T : never;
+export type Exact<P, I extends P> = P extends Builtin ? P
+  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
 
 if (_m0.util.Long !== Long) {
   _m0.util.Long = Long as any;

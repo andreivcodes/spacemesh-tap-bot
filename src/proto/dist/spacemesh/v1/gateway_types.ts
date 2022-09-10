@@ -1,6 +1,7 @@
 /* eslint-disable */
-import { Status } from "../../google/rpc/status";
+import Long from "long";
 import _m0 from "protobufjs/minimal";
+import { Status } from "../../google/rpc/status";
 
 export const protobufPackage = "spacemesh.v1";
 
@@ -18,20 +19,14 @@ function createBaseBroadcastPoetRequest(): BroadcastPoetRequest {
 }
 
 export const BroadcastPoetRequest = {
-  encode(
-    message: BroadcastPoetRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: BroadcastPoetRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.data.length !== 0) {
       writer.uint32(10).bytes(message.data);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): BroadcastPoetRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): BroadcastPoetRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseBroadcastPoetRequest();
@@ -50,23 +45,17 @@ export const BroadcastPoetRequest = {
   },
 
   fromJSON(object: any): BroadcastPoetRequest {
-    return {
-      data: isSet(object.data)
-        ? bytesFromBase64(object.data)
-        : new Uint8Array(),
-    };
+    return { data: isSet(object.data) ? bytesFromBase64(object.data) : new Uint8Array() };
   },
 
   toJSON(message: BroadcastPoetRequest): unknown {
     const obj: any = {};
     message.data !== undefined &&
-      (obj.data = base64FromBytes(
-        message.data !== undefined ? message.data : new Uint8Array()
-      ));
+      (obj.data = base64FromBytes(message.data !== undefined ? message.data : new Uint8Array()));
     return obj;
   },
 
-  fromPartial(object: DeepPartial<BroadcastPoetRequest>): BroadcastPoetRequest {
+  fromPartial<I extends Exact<DeepPartial<BroadcastPoetRequest>, I>>(object: I): BroadcastPoetRequest {
     const message = createBaseBroadcastPoetRequest();
     message.data = object.data ?? new Uint8Array();
     return message;
@@ -78,20 +67,14 @@ function createBaseBroadcastPoetResponse(): BroadcastPoetResponse {
 }
 
 export const BroadcastPoetResponse = {
-  encode(
-    message: BroadcastPoetResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: BroadcastPoetResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.status !== undefined) {
       Status.encode(message.status, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): BroadcastPoetResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): BroadcastPoetResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseBroadcastPoetResponse();
@@ -110,26 +93,20 @@ export const BroadcastPoetResponse = {
   },
 
   fromJSON(object: any): BroadcastPoetResponse {
-    return {
-      status: isSet(object.status) ? Status.fromJSON(object.status) : undefined,
-    };
+    return { status: isSet(object.status) ? Status.fromJSON(object.status) : undefined };
   },
 
   toJSON(message: BroadcastPoetResponse): unknown {
     const obj: any = {};
-    message.status !== undefined &&
-      (obj.status = message.status ? Status.toJSON(message.status) : undefined);
+    message.status !== undefined && (obj.status = message.status ? Status.toJSON(message.status) : undefined);
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<BroadcastPoetResponse>
-  ): BroadcastPoetResponse {
+  fromPartial<I extends Exact<DeepPartial<BroadcastPoetResponse>, I>>(object: I): BroadcastPoetResponse {
     const message = createBaseBroadcastPoetResponse();
-    message.status =
-      object.status !== undefined && object.status !== null
-        ? Status.fromPartial(object.status)
-        : undefined;
+    message.status = (object.status !== undefined && object.status !== null)
+      ? Status.fromPartial(object.status)
+      : undefined;
     return message;
   },
 };
@@ -138,10 +115,18 @@ declare var self: any | undefined;
 declare var window: any | undefined;
 declare var global: any | undefined;
 var globalThis: any = (() => {
-  if (typeof globalThis !== "undefined") return globalThis;
-  if (typeof self !== "undefined") return self;
-  if (typeof window !== "undefined") return window;
-  if (typeof global !== "undefined") return global;
+  if (typeof globalThis !== "undefined") {
+    return globalThis;
+  }
+  if (typeof self !== "undefined") {
+    return self;
+  }
+  if (typeof window !== "undefined") {
+    return window;
+  }
+  if (typeof global !== "undefined") {
+    return global;
+  }
   throw "Unable to locate global object";
 })();
 
@@ -170,24 +155,22 @@ function base64FromBytes(arr: Uint8Array): string {
   }
 }
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-export type DeepPartial<T> = T extends Builtin
-  ? T
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
+export type DeepPartial<T> = T extends Builtin ? T
+  : T extends Long ? string | number | Long : T extends Array<infer U> ? Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
+
+type KeysOfUnion<T> = T extends T ? keyof T : never;
+export type Exact<P, I extends P> = P extends Builtin ? P
+  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
+
+if (_m0.util.Long !== Long) {
+  _m0.util.Long = Long as any;
+  _m0.configure();
+}
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;

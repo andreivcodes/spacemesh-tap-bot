@@ -1,15 +1,7 @@
 /* eslint-disable */
 import Long from "long";
-import {
-  Amount,
-  AccountId,
-  TransactionId,
-  LayerNumber,
-  Reward,
-  SmesherId,
-  AppEvent,
-} from "./types";
 import _m0 from "protobufjs/minimal";
+import { AccountId, Amount, AppEvent, LayerNumber, Reward, SmesherId, TransactionId } from "./types";
 
 export const protobufPackage = "spacemesh.v1";
 
@@ -122,16 +114,20 @@ export function globalStateDataFlagToJSON(object: GlobalStateDataFlag): string {
 
 export interface AccountState {
   /** aka nonce */
-  counter: number;
+  counter: Long;
   /** known account balance */
   balance: Amount | undefined;
 }
 
 export interface Account {
   /** account public address */
-  accountId: AccountId | undefined;
+  accountId:
+    | AccountId
+    | undefined;
   /** current state */
-  stateCurrent: AccountState | undefined;
+  stateCurrent:
+    | AccountState
+    | undefined;
   /** projected state (includes pending txs) */
   stateProjected: AccountState | undefined;
 }
@@ -145,7 +141,9 @@ export interface AccountResponse {
 }
 
 export interface AccountDataFilter {
-  accountId: AccountId | undefined;
+  accountId:
+    | AccountId
+    | undefined;
   /** bit field of AccountDataFlag */
   accountDataFlags: number;
 }
@@ -159,7 +157,9 @@ export interface AccountDataStreamResponse {
 }
 
 export interface AccountDataQueryRequest {
-  filter: AccountDataFilter | undefined;
+  filter:
+    | AccountDataFilter
+    | undefined;
   /** max numbers of results client would like to get */
   maxResults: number;
   /** return results from offset */
@@ -168,15 +168,21 @@ export interface AccountDataQueryRequest {
 
 export interface TransactionReceipt {
   /** the source transaction */
-  id: TransactionId | undefined;
+  id:
+    | TransactionId
+    | undefined;
   /** tx processing result */
   result: TransactionReceipt_TransactionResult;
   /** gas units used by the transaction */
-  gasUsed: number;
+  gasUsed: Long;
   /** transaction fee charged for the transaction (in smidge, gas_price * gas_used) */
-  fee: Amount | undefined;
+  fee:
+    | Amount
+    | undefined;
   /** the layer in which the STF processed this transaction */
-  layer: LayerNumber | undefined;
+  layer:
+    | LayerNumber
+    | undefined;
   /** the index of the tx in the ordered list of txs to be executed by stf in the layer. */
   index: number;
   /** svm binary data. Decode with svm-codec */
@@ -199,9 +205,7 @@ export enum TransactionReceipt_TransactionResult {
   UNRECOGNIZED = -1,
 }
 
-export function transactionReceipt_TransactionResultFromJSON(
-  object: any
-): TransactionReceipt_TransactionResult {
+export function transactionReceipt_TransactionResultFromJSON(object: any): TransactionReceipt_TransactionResult {
   switch (object) {
     case 0:
     case "TRANSACTION_RESULT_UNSPECIFIED":
@@ -228,9 +232,7 @@ export function transactionReceipt_TransactionResultFromJSON(
   }
 }
 
-export function transactionReceipt_TransactionResultToJSON(
-  object: TransactionReceipt_TransactionResult
-): string {
+export function transactionReceipt_TransactionResultToJSON(object: TransactionReceipt_TransactionResult): string {
   switch (object) {
     case TransactionReceipt_TransactionResult.TRANSACTION_RESULT_UNSPECIFIED:
       return "TRANSACTION_RESULT_UNSPECIFIED";
@@ -277,7 +279,9 @@ export interface SmesherRewardStreamResponse {
 }
 
 export interface SmesherDataQueryRequest {
-  smesherId: SmesherId | undefined;
+  smesherId:
+    | SmesherId
+    | undefined;
   /** max numbers of results client would like to get */
   maxResults: number;
   /** return results from offset */
@@ -298,7 +302,8 @@ export interface GlobalStateHash {
  * For now this is empty but in future we might want to allow this to take a
  * layer number.
  */
-export interface GlobalStateHashRequest {}
+export interface GlobalStateHashRequest {
+}
 
 export interface GlobalStateHashResponse {
   response: GlobalStateHash | undefined;
@@ -320,22 +325,20 @@ export interface GlobalStateStreamResponse {
   datum: GlobalStateData | undefined;
 }
 
-export interface AppEventStreamRequest {}
+export interface AppEventStreamRequest {
+}
 
 export interface AppEventStreamResponse {
   event: AppEvent | undefined;
 }
 
 function createBaseAccountState(): AccountState {
-  return { counter: 0, balance: undefined };
+  return { counter: Long.UZERO, balance: undefined };
 }
 
 export const AccountState = {
-  encode(
-    message: AccountState,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
-    if (message.counter !== 0) {
+  encode(message: AccountState, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (!message.counter.isZero()) {
       writer.uint32(8).uint64(message.counter);
     }
     if (message.balance !== undefined) {
@@ -352,7 +355,7 @@ export const AccountState = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.counter = longToNumber(reader.uint64() as Long);
+          message.counter = reader.uint64() as Long;
           break;
         case 2:
           message.balance = Amount.decode(reader, reader.uint32());
@@ -367,62 +370,44 @@ export const AccountState = {
 
   fromJSON(object: any): AccountState {
     return {
-      counter: isSet(object.counter) ? Number(object.counter) : 0,
-      balance: isSet(object.balance)
-        ? Amount.fromJSON(object.balance)
-        : undefined,
+      counter: isSet(object.counter) ? Long.fromValue(object.counter) : Long.UZERO,
+      balance: isSet(object.balance) ? Amount.fromJSON(object.balance) : undefined,
     };
   },
 
   toJSON(message: AccountState): unknown {
     const obj: any = {};
-    message.counter !== undefined &&
-      (obj.counter = Math.round(message.counter));
-    message.balance !== undefined &&
-      (obj.balance = message.balance
-        ? Amount.toJSON(message.balance)
-        : undefined);
+    message.counter !== undefined && (obj.counter = (message.counter || Long.UZERO).toString());
+    message.balance !== undefined && (obj.balance = message.balance ? Amount.toJSON(message.balance) : undefined);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<AccountState>): AccountState {
+  fromPartial<I extends Exact<DeepPartial<AccountState>, I>>(object: I): AccountState {
     const message = createBaseAccountState();
-    message.counter = object.counter ?? 0;
-    message.balance =
-      object.balance !== undefined && object.balance !== null
-        ? Amount.fromPartial(object.balance)
-        : undefined;
+    message.counter = (object.counter !== undefined && object.counter !== null)
+      ? Long.fromValue(object.counter)
+      : Long.UZERO;
+    message.balance = (object.balance !== undefined && object.balance !== null)
+      ? Amount.fromPartial(object.balance)
+      : undefined;
     return message;
   },
 };
 
 function createBaseAccount(): Account {
-  return {
-    accountId: undefined,
-    stateCurrent: undefined,
-    stateProjected: undefined,
-  };
+  return { accountId: undefined, stateCurrent: undefined, stateProjected: undefined };
 }
 
 export const Account = {
-  encode(
-    message: Account,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: Account, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.accountId !== undefined) {
       AccountId.encode(message.accountId, writer.uint32(10).fork()).ldelim();
     }
     if (message.stateCurrent !== undefined) {
-      AccountState.encode(
-        message.stateCurrent,
-        writer.uint32(18).fork()
-      ).ldelim();
+      AccountState.encode(message.stateCurrent, writer.uint32(18).fork()).ldelim();
     }
     if (message.stateProjected !== undefined) {
-      AccountState.encode(
-        message.stateProjected,
-        writer.uint32(26).fork()
-      ).ldelim();
+      AccountState.encode(message.stateProjected, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -453,49 +438,34 @@ export const Account = {
 
   fromJSON(object: any): Account {
     return {
-      accountId: isSet(object.accountId)
-        ? AccountId.fromJSON(object.accountId)
-        : undefined,
-      stateCurrent: isSet(object.stateCurrent)
-        ? AccountState.fromJSON(object.stateCurrent)
-        : undefined,
-      stateProjected: isSet(object.stateProjected)
-        ? AccountState.fromJSON(object.stateProjected)
-        : undefined,
+      accountId: isSet(object.accountId) ? AccountId.fromJSON(object.accountId) : undefined,
+      stateCurrent: isSet(object.stateCurrent) ? AccountState.fromJSON(object.stateCurrent) : undefined,
+      stateProjected: isSet(object.stateProjected) ? AccountState.fromJSON(object.stateProjected) : undefined,
     };
   },
 
   toJSON(message: Account): unknown {
     const obj: any = {};
     message.accountId !== undefined &&
-      (obj.accountId = message.accountId
-        ? AccountId.toJSON(message.accountId)
-        : undefined);
+      (obj.accountId = message.accountId ? AccountId.toJSON(message.accountId) : undefined);
     message.stateCurrent !== undefined &&
-      (obj.stateCurrent = message.stateCurrent
-        ? AccountState.toJSON(message.stateCurrent)
-        : undefined);
+      (obj.stateCurrent = message.stateCurrent ? AccountState.toJSON(message.stateCurrent) : undefined);
     message.stateProjected !== undefined &&
-      (obj.stateProjected = message.stateProjected
-        ? AccountState.toJSON(message.stateProjected)
-        : undefined);
+      (obj.stateProjected = message.stateProjected ? AccountState.toJSON(message.stateProjected) : undefined);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<Account>): Account {
+  fromPartial<I extends Exact<DeepPartial<Account>, I>>(object: I): Account {
     const message = createBaseAccount();
-    message.accountId =
-      object.accountId !== undefined && object.accountId !== null
-        ? AccountId.fromPartial(object.accountId)
-        : undefined;
-    message.stateCurrent =
-      object.stateCurrent !== undefined && object.stateCurrent !== null
-        ? AccountState.fromPartial(object.stateCurrent)
-        : undefined;
-    message.stateProjected =
-      object.stateProjected !== undefined && object.stateProjected !== null
-        ? AccountState.fromPartial(object.stateProjected)
-        : undefined;
+    message.accountId = (object.accountId !== undefined && object.accountId !== null)
+      ? AccountId.fromPartial(object.accountId)
+      : undefined;
+    message.stateCurrent = (object.stateCurrent !== undefined && object.stateCurrent !== null)
+      ? AccountState.fromPartial(object.stateCurrent)
+      : undefined;
+    message.stateProjected = (object.stateProjected !== undefined && object.stateProjected !== null)
+      ? AccountState.fromPartial(object.stateProjected)
+      : undefined;
     return message;
   },
 };
@@ -505,10 +475,7 @@ function createBaseAccountRequest(): AccountRequest {
 }
 
 export const AccountRequest = {
-  encode(
-    message: AccountRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: AccountRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.accountId !== undefined) {
       AccountId.encode(message.accountId, writer.uint32(10).fork()).ldelim();
     }
@@ -534,28 +501,21 @@ export const AccountRequest = {
   },
 
   fromJSON(object: any): AccountRequest {
-    return {
-      accountId: isSet(object.accountId)
-        ? AccountId.fromJSON(object.accountId)
-        : undefined,
-    };
+    return { accountId: isSet(object.accountId) ? AccountId.fromJSON(object.accountId) : undefined };
   },
 
   toJSON(message: AccountRequest): unknown {
     const obj: any = {};
     message.accountId !== undefined &&
-      (obj.accountId = message.accountId
-        ? AccountId.toJSON(message.accountId)
-        : undefined);
+      (obj.accountId = message.accountId ? AccountId.toJSON(message.accountId) : undefined);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<AccountRequest>): AccountRequest {
+  fromPartial<I extends Exact<DeepPartial<AccountRequest>, I>>(object: I): AccountRequest {
     const message = createBaseAccountRequest();
-    message.accountId =
-      object.accountId !== undefined && object.accountId !== null
-        ? AccountId.fromPartial(object.accountId)
-        : undefined;
+    message.accountId = (object.accountId !== undefined && object.accountId !== null)
+      ? AccountId.fromPartial(object.accountId)
+      : undefined;
     return message;
   },
 };
@@ -565,10 +525,7 @@ function createBaseAccountResponse(): AccountResponse {
 }
 
 export const AccountResponse = {
-  encode(
-    message: AccountResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: AccountResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.accountWrapper !== undefined) {
       Account.encode(message.accountWrapper, writer.uint32(10).fork()).ldelim();
     }
@@ -594,28 +551,21 @@ export const AccountResponse = {
   },
 
   fromJSON(object: any): AccountResponse {
-    return {
-      accountWrapper: isSet(object.accountWrapper)
-        ? Account.fromJSON(object.accountWrapper)
-        : undefined,
-    };
+    return { accountWrapper: isSet(object.accountWrapper) ? Account.fromJSON(object.accountWrapper) : undefined };
   },
 
   toJSON(message: AccountResponse): unknown {
     const obj: any = {};
     message.accountWrapper !== undefined &&
-      (obj.accountWrapper = message.accountWrapper
-        ? Account.toJSON(message.accountWrapper)
-        : undefined);
+      (obj.accountWrapper = message.accountWrapper ? Account.toJSON(message.accountWrapper) : undefined);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<AccountResponse>): AccountResponse {
+  fromPartial<I extends Exact<DeepPartial<AccountResponse>, I>>(object: I): AccountResponse {
     const message = createBaseAccountResponse();
-    message.accountWrapper =
-      object.accountWrapper !== undefined && object.accountWrapper !== null
-        ? Account.fromPartial(object.accountWrapper)
-        : undefined;
+    message.accountWrapper = (object.accountWrapper !== undefined && object.accountWrapper !== null)
+      ? Account.fromPartial(object.accountWrapper)
+      : undefined;
     return message;
   },
 };
@@ -625,10 +575,7 @@ function createBaseAccountDataFilter(): AccountDataFilter {
 }
 
 export const AccountDataFilter = {
-  encode(
-    message: AccountDataFilter,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: AccountDataFilter, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.accountId !== undefined) {
       AccountId.encode(message.accountId, writer.uint32(10).fork()).ldelim();
     }
@@ -661,32 +608,24 @@ export const AccountDataFilter = {
 
   fromJSON(object: any): AccountDataFilter {
     return {
-      accountId: isSet(object.accountId)
-        ? AccountId.fromJSON(object.accountId)
-        : undefined,
-      accountDataFlags: isSet(object.accountDataFlags)
-        ? Number(object.accountDataFlags)
-        : 0,
+      accountId: isSet(object.accountId) ? AccountId.fromJSON(object.accountId) : undefined,
+      accountDataFlags: isSet(object.accountDataFlags) ? Number(object.accountDataFlags) : 0,
     };
   },
 
   toJSON(message: AccountDataFilter): unknown {
     const obj: any = {};
     message.accountId !== undefined &&
-      (obj.accountId = message.accountId
-        ? AccountId.toJSON(message.accountId)
-        : undefined);
-    message.accountDataFlags !== undefined &&
-      (obj.accountDataFlags = Math.round(message.accountDataFlags));
+      (obj.accountId = message.accountId ? AccountId.toJSON(message.accountId) : undefined);
+    message.accountDataFlags !== undefined && (obj.accountDataFlags = Math.round(message.accountDataFlags));
     return obj;
   },
 
-  fromPartial(object: DeepPartial<AccountDataFilter>): AccountDataFilter {
+  fromPartial<I extends Exact<DeepPartial<AccountDataFilter>, I>>(object: I): AccountDataFilter {
     const message = createBaseAccountDataFilter();
-    message.accountId =
-      object.accountId !== undefined && object.accountId !== null
-        ? AccountId.fromPartial(object.accountId)
-        : undefined;
+    message.accountId = (object.accountId !== undefined && object.accountId !== null)
+      ? AccountId.fromPartial(object.accountId)
+      : undefined;
     message.accountDataFlags = object.accountDataFlags ?? 0;
     return message;
   },
@@ -697,23 +636,14 @@ function createBaseAccountDataStreamRequest(): AccountDataStreamRequest {
 }
 
 export const AccountDataStreamRequest = {
-  encode(
-    message: AccountDataStreamRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: AccountDataStreamRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.filter !== undefined) {
-      AccountDataFilter.encode(
-        message.filter,
-        writer.uint32(10).fork()
-      ).ldelim();
+      AccountDataFilter.encode(message.filter, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): AccountDataStreamRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): AccountDataStreamRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseAccountDataStreamRequest();
@@ -732,30 +662,21 @@ export const AccountDataStreamRequest = {
   },
 
   fromJSON(object: any): AccountDataStreamRequest {
-    return {
-      filter: isSet(object.filter)
-        ? AccountDataFilter.fromJSON(object.filter)
-        : undefined,
-    };
+    return { filter: isSet(object.filter) ? AccountDataFilter.fromJSON(object.filter) : undefined };
   },
 
   toJSON(message: AccountDataStreamRequest): unknown {
     const obj: any = {};
     message.filter !== undefined &&
-      (obj.filter = message.filter
-        ? AccountDataFilter.toJSON(message.filter)
-        : undefined);
+      (obj.filter = message.filter ? AccountDataFilter.toJSON(message.filter) : undefined);
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<AccountDataStreamRequest>
-  ): AccountDataStreamRequest {
+  fromPartial<I extends Exact<DeepPartial<AccountDataStreamRequest>, I>>(object: I): AccountDataStreamRequest {
     const message = createBaseAccountDataStreamRequest();
-    message.filter =
-      object.filter !== undefined && object.filter !== null
-        ? AccountDataFilter.fromPartial(object.filter)
-        : undefined;
+    message.filter = (object.filter !== undefined && object.filter !== null)
+      ? AccountDataFilter.fromPartial(object.filter)
+      : undefined;
     return message;
   },
 };
@@ -765,20 +686,14 @@ function createBaseAccountDataStreamResponse(): AccountDataStreamResponse {
 }
 
 export const AccountDataStreamResponse = {
-  encode(
-    message: AccountDataStreamResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: AccountDataStreamResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.datum !== undefined) {
       AccountData.encode(message.datum, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): AccountDataStreamResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): AccountDataStreamResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseAccountDataStreamResponse();
@@ -797,30 +712,20 @@ export const AccountDataStreamResponse = {
   },
 
   fromJSON(object: any): AccountDataStreamResponse {
-    return {
-      datum: isSet(object.datum)
-        ? AccountData.fromJSON(object.datum)
-        : undefined,
-    };
+    return { datum: isSet(object.datum) ? AccountData.fromJSON(object.datum) : undefined };
   },
 
   toJSON(message: AccountDataStreamResponse): unknown {
     const obj: any = {};
-    message.datum !== undefined &&
-      (obj.datum = message.datum
-        ? AccountData.toJSON(message.datum)
-        : undefined);
+    message.datum !== undefined && (obj.datum = message.datum ? AccountData.toJSON(message.datum) : undefined);
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<AccountDataStreamResponse>
-  ): AccountDataStreamResponse {
+  fromPartial<I extends Exact<DeepPartial<AccountDataStreamResponse>, I>>(object: I): AccountDataStreamResponse {
     const message = createBaseAccountDataStreamResponse();
-    message.datum =
-      object.datum !== undefined && object.datum !== null
-        ? AccountData.fromPartial(object.datum)
-        : undefined;
+    message.datum = (object.datum !== undefined && object.datum !== null)
+      ? AccountData.fromPartial(object.datum)
+      : undefined;
     return message;
   },
 };
@@ -830,15 +735,9 @@ function createBaseAccountDataQueryRequest(): AccountDataQueryRequest {
 }
 
 export const AccountDataQueryRequest = {
-  encode(
-    message: AccountDataQueryRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: AccountDataQueryRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.filter !== undefined) {
-      AccountDataFilter.encode(
-        message.filter,
-        writer.uint32(10).fork()
-      ).ldelim();
+      AccountDataFilter.encode(message.filter, writer.uint32(10).fork()).ldelim();
     }
     if (message.maxResults !== 0) {
       writer.uint32(16).uint32(message.maxResults);
@@ -849,10 +748,7 @@ export const AccountDataQueryRequest = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): AccountDataQueryRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): AccountDataQueryRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseAccountDataQueryRequest();
@@ -878,9 +774,7 @@ export const AccountDataQueryRequest = {
 
   fromJSON(object: any): AccountDataQueryRequest {
     return {
-      filter: isSet(object.filter)
-        ? AccountDataFilter.fromJSON(object.filter)
-        : undefined,
+      filter: isSet(object.filter) ? AccountDataFilter.fromJSON(object.filter) : undefined,
       maxResults: isSet(object.maxResults) ? Number(object.maxResults) : 0,
       offset: isSet(object.offset) ? Number(object.offset) : 0,
     };
@@ -889,23 +783,17 @@ export const AccountDataQueryRequest = {
   toJSON(message: AccountDataQueryRequest): unknown {
     const obj: any = {};
     message.filter !== undefined &&
-      (obj.filter = message.filter
-        ? AccountDataFilter.toJSON(message.filter)
-        : undefined);
-    message.maxResults !== undefined &&
-      (obj.maxResults = Math.round(message.maxResults));
+      (obj.filter = message.filter ? AccountDataFilter.toJSON(message.filter) : undefined);
+    message.maxResults !== undefined && (obj.maxResults = Math.round(message.maxResults));
     message.offset !== undefined && (obj.offset = Math.round(message.offset));
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<AccountDataQueryRequest>
-  ): AccountDataQueryRequest {
+  fromPartial<I extends Exact<DeepPartial<AccountDataQueryRequest>, I>>(object: I): AccountDataQueryRequest {
     const message = createBaseAccountDataQueryRequest();
-    message.filter =
-      object.filter !== undefined && object.filter !== null
-        ? AccountDataFilter.fromPartial(object.filter)
-        : undefined;
+    message.filter = (object.filter !== undefined && object.filter !== null)
+      ? AccountDataFilter.fromPartial(object.filter)
+      : undefined;
     message.maxResults = object.maxResults ?? 0;
     message.offset = object.offset ?? 0;
     return message;
@@ -916,7 +804,7 @@ function createBaseTransactionReceipt(): TransactionReceipt {
   return {
     id: undefined,
     result: 0,
-    gasUsed: 0,
+    gasUsed: Long.UZERO,
     fee: undefined,
     layer: undefined,
     index: 0,
@@ -925,17 +813,14 @@ function createBaseTransactionReceipt(): TransactionReceipt {
 }
 
 export const TransactionReceipt = {
-  encode(
-    message: TransactionReceipt,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: TransactionReceipt, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.id !== undefined) {
       TransactionId.encode(message.id, writer.uint32(10).fork()).ldelim();
     }
     if (message.result !== 0) {
       writer.uint32(16).int32(message.result);
     }
-    if (message.gasUsed !== 0) {
+    if (!message.gasUsed.isZero()) {
       writer.uint32(24).uint64(message.gasUsed);
     }
     if (message.fee !== undefined) {
@@ -967,7 +852,7 @@ export const TransactionReceipt = {
           message.result = reader.int32() as any;
           break;
         case 3:
-          message.gasUsed = longToNumber(reader.uint64() as Long);
+          message.gasUsed = reader.uint64() as Long;
           break;
         case 4:
           message.fee = Amount.decode(reader, reader.uint32());
@@ -992,59 +877,39 @@ export const TransactionReceipt = {
   fromJSON(object: any): TransactionReceipt {
     return {
       id: isSet(object.id) ? TransactionId.fromJSON(object.id) : undefined,
-      result: isSet(object.result)
-        ? transactionReceipt_TransactionResultFromJSON(object.result)
-        : 0,
-      gasUsed: isSet(object.gasUsed) ? Number(object.gasUsed) : 0,
+      result: isSet(object.result) ? transactionReceipt_TransactionResultFromJSON(object.result) : 0,
+      gasUsed: isSet(object.gasUsed) ? Long.fromValue(object.gasUsed) : Long.UZERO,
       fee: isSet(object.fee) ? Amount.fromJSON(object.fee) : undefined,
-      layer: isSet(object.layer)
-        ? LayerNumber.fromJSON(object.layer)
-        : undefined,
+      layer: isSet(object.layer) ? LayerNumber.fromJSON(object.layer) : undefined,
       index: isSet(object.index) ? Number(object.index) : 0,
-      svmData: isSet(object.svmData)
-        ? bytesFromBase64(object.svmData)
-        : new Uint8Array(),
+      svmData: isSet(object.svmData) ? bytesFromBase64(object.svmData) : new Uint8Array(),
     };
   },
 
   toJSON(message: TransactionReceipt): unknown {
     const obj: any = {};
-    message.id !== undefined &&
-      (obj.id = message.id ? TransactionId.toJSON(message.id) : undefined);
-    message.result !== undefined &&
-      (obj.result = transactionReceipt_TransactionResultToJSON(message.result));
-    message.gasUsed !== undefined &&
-      (obj.gasUsed = Math.round(message.gasUsed));
-    message.fee !== undefined &&
-      (obj.fee = message.fee ? Amount.toJSON(message.fee) : undefined);
-    message.layer !== undefined &&
-      (obj.layer = message.layer
-        ? LayerNumber.toJSON(message.layer)
-        : undefined);
+    message.id !== undefined && (obj.id = message.id ? TransactionId.toJSON(message.id) : undefined);
+    message.result !== undefined && (obj.result = transactionReceipt_TransactionResultToJSON(message.result));
+    message.gasUsed !== undefined && (obj.gasUsed = (message.gasUsed || Long.UZERO).toString());
+    message.fee !== undefined && (obj.fee = message.fee ? Amount.toJSON(message.fee) : undefined);
+    message.layer !== undefined && (obj.layer = message.layer ? LayerNumber.toJSON(message.layer) : undefined);
     message.index !== undefined && (obj.index = Math.round(message.index));
     message.svmData !== undefined &&
-      (obj.svmData = base64FromBytes(
-        message.svmData !== undefined ? message.svmData : new Uint8Array()
-      ));
+      (obj.svmData = base64FromBytes(message.svmData !== undefined ? message.svmData : new Uint8Array()));
     return obj;
   },
 
-  fromPartial(object: DeepPartial<TransactionReceipt>): TransactionReceipt {
+  fromPartial<I extends Exact<DeepPartial<TransactionReceipt>, I>>(object: I): TransactionReceipt {
     const message = createBaseTransactionReceipt();
-    message.id =
-      object.id !== undefined && object.id !== null
-        ? TransactionId.fromPartial(object.id)
-        : undefined;
+    message.id = (object.id !== undefined && object.id !== null) ? TransactionId.fromPartial(object.id) : undefined;
     message.result = object.result ?? 0;
-    message.gasUsed = object.gasUsed ?? 0;
-    message.fee =
-      object.fee !== undefined && object.fee !== null
-        ? Amount.fromPartial(object.fee)
-        : undefined;
-    message.layer =
-      object.layer !== undefined && object.layer !== null
-        ? LayerNumber.fromPartial(object.layer)
-        : undefined;
+    message.gasUsed = (object.gasUsed !== undefined && object.gasUsed !== null)
+      ? Long.fromValue(object.gasUsed)
+      : Long.UZERO;
+    message.fee = (object.fee !== undefined && object.fee !== null) ? Amount.fromPartial(object.fee) : undefined;
+    message.layer = (object.layer !== undefined && object.layer !== null)
+      ? LayerNumber.fromPartial(object.layer)
+      : undefined;
     message.index = object.index ?? 0;
     message.svmData = object.svmData ?? new Uint8Array();
     return message;
@@ -1056,18 +921,12 @@ function createBaseAccountData(): AccountData {
 }
 
 export const AccountData = {
-  encode(
-    message: AccountData,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: AccountData, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.reward !== undefined) {
       Reward.encode(message.reward, writer.uint32(10).fork()).ldelim();
     }
     if (message.receipt !== undefined) {
-      TransactionReceipt.encode(
-        message.receipt,
-        writer.uint32(18).fork()
-      ).ldelim();
+      TransactionReceipt.encode(message.receipt, writer.uint32(18).fork()).ldelim();
     }
     if (message.accountWrapper !== undefined) {
       Account.encode(message.accountWrapper, writer.uint32(26).fork()).ldelim();
@@ -1102,44 +961,32 @@ export const AccountData = {
   fromJSON(object: any): AccountData {
     return {
       reward: isSet(object.reward) ? Reward.fromJSON(object.reward) : undefined,
-      receipt: isSet(object.receipt)
-        ? TransactionReceipt.fromJSON(object.receipt)
-        : undefined,
-      accountWrapper: isSet(object.accountWrapper)
-        ? Account.fromJSON(object.accountWrapper)
-        : undefined,
+      receipt: isSet(object.receipt) ? TransactionReceipt.fromJSON(object.receipt) : undefined,
+      accountWrapper: isSet(object.accountWrapper) ? Account.fromJSON(object.accountWrapper) : undefined,
     };
   },
 
   toJSON(message: AccountData): unknown {
     const obj: any = {};
-    message.reward !== undefined &&
-      (obj.reward = message.reward ? Reward.toJSON(message.reward) : undefined);
+    message.reward !== undefined && (obj.reward = message.reward ? Reward.toJSON(message.reward) : undefined);
     message.receipt !== undefined &&
-      (obj.receipt = message.receipt
-        ? TransactionReceipt.toJSON(message.receipt)
-        : undefined);
+      (obj.receipt = message.receipt ? TransactionReceipt.toJSON(message.receipt) : undefined);
     message.accountWrapper !== undefined &&
-      (obj.accountWrapper = message.accountWrapper
-        ? Account.toJSON(message.accountWrapper)
-        : undefined);
+      (obj.accountWrapper = message.accountWrapper ? Account.toJSON(message.accountWrapper) : undefined);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<AccountData>): AccountData {
+  fromPartial<I extends Exact<DeepPartial<AccountData>, I>>(object: I): AccountData {
     const message = createBaseAccountData();
-    message.reward =
-      object.reward !== undefined && object.reward !== null
-        ? Reward.fromPartial(object.reward)
-        : undefined;
-    message.receipt =
-      object.receipt !== undefined && object.receipt !== null
-        ? TransactionReceipt.fromPartial(object.receipt)
-        : undefined;
-    message.accountWrapper =
-      object.accountWrapper !== undefined && object.accountWrapper !== null
-        ? Account.fromPartial(object.accountWrapper)
-        : undefined;
+    message.reward = (object.reward !== undefined && object.reward !== null)
+      ? Reward.fromPartial(object.reward)
+      : undefined;
+    message.receipt = (object.receipt !== undefined && object.receipt !== null)
+      ? TransactionReceipt.fromPartial(object.receipt)
+      : undefined;
+    message.accountWrapper = (object.accountWrapper !== undefined && object.accountWrapper !== null)
+      ? Account.fromPartial(object.accountWrapper)
+      : undefined;
     return message;
   },
 };
@@ -1149,10 +996,7 @@ function createBaseAccountDataQueryResponse(): AccountDataQueryResponse {
 }
 
 export const AccountDataQueryResponse = {
-  encode(
-    message: AccountDataQueryResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: AccountDataQueryResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.totalResults !== 0) {
       writer.uint32(8).uint32(message.totalResults);
     }
@@ -1162,10 +1006,7 @@ export const AccountDataQueryResponse = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): AccountDataQueryResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): AccountDataQueryResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseAccountDataQueryResponse();
@@ -1188,9 +1029,7 @@ export const AccountDataQueryResponse = {
 
   fromJSON(object: any): AccountDataQueryResponse {
     return {
-      totalResults: isSet(object.totalResults)
-        ? Number(object.totalResults)
-        : 0,
+      totalResults: isSet(object.totalResults) ? Number(object.totalResults) : 0,
       accountItem: Array.isArray(object?.accountItem)
         ? object.accountItem.map((e: any) => AccountData.fromJSON(e))
         : [],
@@ -1199,25 +1038,19 @@ export const AccountDataQueryResponse = {
 
   toJSON(message: AccountDataQueryResponse): unknown {
     const obj: any = {};
-    message.totalResults !== undefined &&
-      (obj.totalResults = Math.round(message.totalResults));
+    message.totalResults !== undefined && (obj.totalResults = Math.round(message.totalResults));
     if (message.accountItem) {
-      obj.accountItem = message.accountItem.map((e) =>
-        e ? AccountData.toJSON(e) : undefined
-      );
+      obj.accountItem = message.accountItem.map((e) => e ? AccountData.toJSON(e) : undefined);
     } else {
       obj.accountItem = [];
     }
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<AccountDataQueryResponse>
-  ): AccountDataQueryResponse {
+  fromPartial<I extends Exact<DeepPartial<AccountDataQueryResponse>, I>>(object: I): AccountDataQueryResponse {
     const message = createBaseAccountDataQueryResponse();
     message.totalResults = object.totalResults ?? 0;
-    message.accountItem =
-      object.accountItem?.map((e) => AccountData.fromPartial(e)) || [];
+    message.accountItem = object.accountItem?.map((e) => AccountData.fromPartial(e)) || [];
     return message;
   },
 };
@@ -1227,20 +1060,14 @@ function createBaseSmesherRewardStreamRequest(): SmesherRewardStreamRequest {
 }
 
 export const SmesherRewardStreamRequest = {
-  encode(
-    message: SmesherRewardStreamRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: SmesherRewardStreamRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.id !== undefined) {
       SmesherId.encode(message.id, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): SmesherRewardStreamRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): SmesherRewardStreamRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseSmesherRewardStreamRequest();
@@ -1259,26 +1086,18 @@ export const SmesherRewardStreamRequest = {
   },
 
   fromJSON(object: any): SmesherRewardStreamRequest {
-    return {
-      id: isSet(object.id) ? SmesherId.fromJSON(object.id) : undefined,
-    };
+    return { id: isSet(object.id) ? SmesherId.fromJSON(object.id) : undefined };
   },
 
   toJSON(message: SmesherRewardStreamRequest): unknown {
     const obj: any = {};
-    message.id !== undefined &&
-      (obj.id = message.id ? SmesherId.toJSON(message.id) : undefined);
+    message.id !== undefined && (obj.id = message.id ? SmesherId.toJSON(message.id) : undefined);
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<SmesherRewardStreamRequest>
-  ): SmesherRewardStreamRequest {
+  fromPartial<I extends Exact<DeepPartial<SmesherRewardStreamRequest>, I>>(object: I): SmesherRewardStreamRequest {
     const message = createBaseSmesherRewardStreamRequest();
-    message.id =
-      object.id !== undefined && object.id !== null
-        ? SmesherId.fromPartial(object.id)
-        : undefined;
+    message.id = (object.id !== undefined && object.id !== null) ? SmesherId.fromPartial(object.id) : undefined;
     return message;
   },
 };
@@ -1288,20 +1107,14 @@ function createBaseSmesherRewardStreamResponse(): SmesherRewardStreamResponse {
 }
 
 export const SmesherRewardStreamResponse = {
-  encode(
-    message: SmesherRewardStreamResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: SmesherRewardStreamResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.reward !== undefined) {
       Reward.encode(message.reward, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): SmesherRewardStreamResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): SmesherRewardStreamResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseSmesherRewardStreamResponse();
@@ -1320,26 +1133,20 @@ export const SmesherRewardStreamResponse = {
   },
 
   fromJSON(object: any): SmesherRewardStreamResponse {
-    return {
-      reward: isSet(object.reward) ? Reward.fromJSON(object.reward) : undefined,
-    };
+    return { reward: isSet(object.reward) ? Reward.fromJSON(object.reward) : undefined };
   },
 
   toJSON(message: SmesherRewardStreamResponse): unknown {
     const obj: any = {};
-    message.reward !== undefined &&
-      (obj.reward = message.reward ? Reward.toJSON(message.reward) : undefined);
+    message.reward !== undefined && (obj.reward = message.reward ? Reward.toJSON(message.reward) : undefined);
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<SmesherRewardStreamResponse>
-  ): SmesherRewardStreamResponse {
+  fromPartial<I extends Exact<DeepPartial<SmesherRewardStreamResponse>, I>>(object: I): SmesherRewardStreamResponse {
     const message = createBaseSmesherRewardStreamResponse();
-    message.reward =
-      object.reward !== undefined && object.reward !== null
-        ? Reward.fromPartial(object.reward)
-        : undefined;
+    message.reward = (object.reward !== undefined && object.reward !== null)
+      ? Reward.fromPartial(object.reward)
+      : undefined;
     return message;
   },
 };
@@ -1349,10 +1156,7 @@ function createBaseSmesherDataQueryRequest(): SmesherDataQueryRequest {
 }
 
 export const SmesherDataQueryRequest = {
-  encode(
-    message: SmesherDataQueryRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: SmesherDataQueryRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.smesherId !== undefined) {
       SmesherId.encode(message.smesherId, writer.uint32(10).fork()).ldelim();
     }
@@ -1365,10 +1169,7 @@ export const SmesherDataQueryRequest = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): SmesherDataQueryRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): SmesherDataQueryRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseSmesherDataQueryRequest();
@@ -1394,9 +1195,7 @@ export const SmesherDataQueryRequest = {
 
   fromJSON(object: any): SmesherDataQueryRequest {
     return {
-      smesherId: isSet(object.smesherId)
-        ? SmesherId.fromJSON(object.smesherId)
-        : undefined,
+      smesherId: isSet(object.smesherId) ? SmesherId.fromJSON(object.smesherId) : undefined,
       maxResults: isSet(object.maxResults) ? Number(object.maxResults) : 0,
       offset: isSet(object.offset) ? Number(object.offset) : 0,
     };
@@ -1405,23 +1204,17 @@ export const SmesherDataQueryRequest = {
   toJSON(message: SmesherDataQueryRequest): unknown {
     const obj: any = {};
     message.smesherId !== undefined &&
-      (obj.smesherId = message.smesherId
-        ? SmesherId.toJSON(message.smesherId)
-        : undefined);
-    message.maxResults !== undefined &&
-      (obj.maxResults = Math.round(message.maxResults));
+      (obj.smesherId = message.smesherId ? SmesherId.toJSON(message.smesherId) : undefined);
+    message.maxResults !== undefined && (obj.maxResults = Math.round(message.maxResults));
     message.offset !== undefined && (obj.offset = Math.round(message.offset));
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<SmesherDataQueryRequest>
-  ): SmesherDataQueryRequest {
+  fromPartial<I extends Exact<DeepPartial<SmesherDataQueryRequest>, I>>(object: I): SmesherDataQueryRequest {
     const message = createBaseSmesherDataQueryRequest();
-    message.smesherId =
-      object.smesherId !== undefined && object.smesherId !== null
-        ? SmesherId.fromPartial(object.smesherId)
-        : undefined;
+    message.smesherId = (object.smesherId !== undefined && object.smesherId !== null)
+      ? SmesherId.fromPartial(object.smesherId)
+      : undefined;
     message.maxResults = object.maxResults ?? 0;
     message.offset = object.offset ?? 0;
     return message;
@@ -1433,10 +1226,7 @@ function createBaseSmesherDataQueryResponse(): SmesherDataQueryResponse {
 }
 
 export const SmesherDataQueryResponse = {
-  encode(
-    message: SmesherDataQueryResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: SmesherDataQueryResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.totalResults !== 0) {
       writer.uint32(8).uint32(message.totalResults);
     }
@@ -1446,10 +1236,7 @@ export const SmesherDataQueryResponse = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): SmesherDataQueryResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): SmesherDataQueryResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseSmesherDataQueryResponse();
@@ -1472,32 +1259,23 @@ export const SmesherDataQueryResponse = {
 
   fromJSON(object: any): SmesherDataQueryResponse {
     return {
-      totalResults: isSet(object.totalResults)
-        ? Number(object.totalResults)
-        : 0,
-      rewards: Array.isArray(object?.rewards)
-        ? object.rewards.map((e: any) => Reward.fromJSON(e))
-        : [],
+      totalResults: isSet(object.totalResults) ? Number(object.totalResults) : 0,
+      rewards: Array.isArray(object?.rewards) ? object.rewards.map((e: any) => Reward.fromJSON(e)) : [],
     };
   },
 
   toJSON(message: SmesherDataQueryResponse): unknown {
     const obj: any = {};
-    message.totalResults !== undefined &&
-      (obj.totalResults = Math.round(message.totalResults));
+    message.totalResults !== undefined && (obj.totalResults = Math.round(message.totalResults));
     if (message.rewards) {
-      obj.rewards = message.rewards.map((e) =>
-        e ? Reward.toJSON(e) : undefined
-      );
+      obj.rewards = message.rewards.map((e) => e ? Reward.toJSON(e) : undefined);
     } else {
       obj.rewards = [];
     }
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<SmesherDataQueryResponse>
-  ): SmesherDataQueryResponse {
+  fromPartial<I extends Exact<DeepPartial<SmesherDataQueryResponse>, I>>(object: I): SmesherDataQueryResponse {
     const message = createBaseSmesherDataQueryResponse();
     message.totalResults = object.totalResults ?? 0;
     message.rewards = object.rewards?.map((e) => Reward.fromPartial(e)) || [];
@@ -1510,10 +1288,7 @@ function createBaseGlobalStateHash(): GlobalStateHash {
 }
 
 export const GlobalStateHash = {
-  encode(
-    message: GlobalStateHash,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: GlobalStateHash, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.rootHash.length !== 0) {
       writer.uint32(10).bytes(message.rootHash);
     }
@@ -1546,35 +1321,25 @@ export const GlobalStateHash = {
 
   fromJSON(object: any): GlobalStateHash {
     return {
-      rootHash: isSet(object.rootHash)
-        ? bytesFromBase64(object.rootHash)
-        : new Uint8Array(),
-      layer: isSet(object.layer)
-        ? LayerNumber.fromJSON(object.layer)
-        : undefined,
+      rootHash: isSet(object.rootHash) ? bytesFromBase64(object.rootHash) : new Uint8Array(),
+      layer: isSet(object.layer) ? LayerNumber.fromJSON(object.layer) : undefined,
     };
   },
 
   toJSON(message: GlobalStateHash): unknown {
     const obj: any = {};
     message.rootHash !== undefined &&
-      (obj.rootHash = base64FromBytes(
-        message.rootHash !== undefined ? message.rootHash : new Uint8Array()
-      ));
-    message.layer !== undefined &&
-      (obj.layer = message.layer
-        ? LayerNumber.toJSON(message.layer)
-        : undefined);
+      (obj.rootHash = base64FromBytes(message.rootHash !== undefined ? message.rootHash : new Uint8Array()));
+    message.layer !== undefined && (obj.layer = message.layer ? LayerNumber.toJSON(message.layer) : undefined);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<GlobalStateHash>): GlobalStateHash {
+  fromPartial<I extends Exact<DeepPartial<GlobalStateHash>, I>>(object: I): GlobalStateHash {
     const message = createBaseGlobalStateHash();
     message.rootHash = object.rootHash ?? new Uint8Array();
-    message.layer =
-      object.layer !== undefined && object.layer !== null
-        ? LayerNumber.fromPartial(object.layer)
-        : undefined;
+    message.layer = (object.layer !== undefined && object.layer !== null)
+      ? LayerNumber.fromPartial(object.layer)
+      : undefined;
     return message;
   },
 };
@@ -1584,17 +1349,11 @@ function createBaseGlobalStateHashRequest(): GlobalStateHashRequest {
 }
 
 export const GlobalStateHashRequest = {
-  encode(
-    _: GlobalStateHashRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(_: GlobalStateHashRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): GlobalStateHashRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): GlobalStateHashRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGlobalStateHashRequest();
@@ -1618,7 +1377,7 @@ export const GlobalStateHashRequest = {
     return obj;
   },
 
-  fromPartial(_: DeepPartial<GlobalStateHashRequest>): GlobalStateHashRequest {
+  fromPartial<I extends Exact<DeepPartial<GlobalStateHashRequest>, I>>(_: I): GlobalStateHashRequest {
     const message = createBaseGlobalStateHashRequest();
     return message;
   },
@@ -1629,23 +1388,14 @@ function createBaseGlobalStateHashResponse(): GlobalStateHashResponse {
 }
 
 export const GlobalStateHashResponse = {
-  encode(
-    message: GlobalStateHashResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: GlobalStateHashResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.response !== undefined) {
-      GlobalStateHash.encode(
-        message.response,
-        writer.uint32(10).fork()
-      ).ldelim();
+      GlobalStateHash.encode(message.response, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): GlobalStateHashResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): GlobalStateHashResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGlobalStateHashResponse();
@@ -1664,30 +1414,21 @@ export const GlobalStateHashResponse = {
   },
 
   fromJSON(object: any): GlobalStateHashResponse {
-    return {
-      response: isSet(object.response)
-        ? GlobalStateHash.fromJSON(object.response)
-        : undefined,
-    };
+    return { response: isSet(object.response) ? GlobalStateHash.fromJSON(object.response) : undefined };
   },
 
   toJSON(message: GlobalStateHashResponse): unknown {
     const obj: any = {};
     message.response !== undefined &&
-      (obj.response = message.response
-        ? GlobalStateHash.toJSON(message.response)
-        : undefined);
+      (obj.response = message.response ? GlobalStateHash.toJSON(message.response) : undefined);
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<GlobalStateHashResponse>
-  ): GlobalStateHashResponse {
+  fromPartial<I extends Exact<DeepPartial<GlobalStateHashResponse>, I>>(object: I): GlobalStateHashResponse {
     const message = createBaseGlobalStateHashResponse();
-    message.response =
-      object.response !== undefined && object.response !== null
-        ? GlobalStateHash.fromPartial(object.response)
-        : undefined;
+    message.response = (object.response !== undefined && object.response !== null)
+      ? GlobalStateHash.fromPartial(object.response)
+      : undefined;
     return message;
   },
 };
@@ -1697,20 +1438,14 @@ function createBaseGlobalStateStreamRequest(): GlobalStateStreamRequest {
 }
 
 export const GlobalStateStreamRequest = {
-  encode(
-    message: GlobalStateStreamRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: GlobalStateStreamRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.globalStateDataFlags !== 0) {
       writer.uint32(8).uint32(message.globalStateDataFlags);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): GlobalStateStreamRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): GlobalStateStreamRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGlobalStateStreamRequest();
@@ -1729,23 +1464,16 @@ export const GlobalStateStreamRequest = {
   },
 
   fromJSON(object: any): GlobalStateStreamRequest {
-    return {
-      globalStateDataFlags: isSet(object.globalStateDataFlags)
-        ? Number(object.globalStateDataFlags)
-        : 0,
-    };
+    return { globalStateDataFlags: isSet(object.globalStateDataFlags) ? Number(object.globalStateDataFlags) : 0 };
   },
 
   toJSON(message: GlobalStateStreamRequest): unknown {
     const obj: any = {};
-    message.globalStateDataFlags !== undefined &&
-      (obj.globalStateDataFlags = Math.round(message.globalStateDataFlags));
+    message.globalStateDataFlags !== undefined && (obj.globalStateDataFlags = Math.round(message.globalStateDataFlags));
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<GlobalStateStreamRequest>
-  ): GlobalStateStreamRequest {
+  fromPartial<I extends Exact<DeepPartial<GlobalStateStreamRequest>, I>>(object: I): GlobalStateStreamRequest {
     const message = createBaseGlobalStateStreamRequest();
     message.globalStateDataFlags = object.globalStateDataFlags ?? 0;
     return message;
@@ -1753,36 +1481,22 @@ export const GlobalStateStreamRequest = {
 };
 
 function createBaseGlobalStateData(): GlobalStateData {
-  return {
-    reward: undefined,
-    receipt: undefined,
-    accountWrapper: undefined,
-    globalState: undefined,
-  };
+  return { reward: undefined, receipt: undefined, accountWrapper: undefined, globalState: undefined };
 }
 
 export const GlobalStateData = {
-  encode(
-    message: GlobalStateData,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: GlobalStateData, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.reward !== undefined) {
       Reward.encode(message.reward, writer.uint32(10).fork()).ldelim();
     }
     if (message.receipt !== undefined) {
-      TransactionReceipt.encode(
-        message.receipt,
-        writer.uint32(18).fork()
-      ).ldelim();
+      TransactionReceipt.encode(message.receipt, writer.uint32(18).fork()).ldelim();
     }
     if (message.accountWrapper !== undefined) {
       Account.encode(message.accountWrapper, writer.uint32(26).fork()).ldelim();
     }
     if (message.globalState !== undefined) {
-      GlobalStateHash.encode(
-        message.globalState,
-        writer.uint32(34).fork()
-      ).ldelim();
+      GlobalStateHash.encode(message.globalState, writer.uint32(34).fork()).ldelim();
     }
     return writer;
   },
@@ -1817,55 +1531,38 @@ export const GlobalStateData = {
   fromJSON(object: any): GlobalStateData {
     return {
       reward: isSet(object.reward) ? Reward.fromJSON(object.reward) : undefined,
-      receipt: isSet(object.receipt)
-        ? TransactionReceipt.fromJSON(object.receipt)
-        : undefined,
-      accountWrapper: isSet(object.accountWrapper)
-        ? Account.fromJSON(object.accountWrapper)
-        : undefined,
-      globalState: isSet(object.globalState)
-        ? GlobalStateHash.fromJSON(object.globalState)
-        : undefined,
+      receipt: isSet(object.receipt) ? TransactionReceipt.fromJSON(object.receipt) : undefined,
+      accountWrapper: isSet(object.accountWrapper) ? Account.fromJSON(object.accountWrapper) : undefined,
+      globalState: isSet(object.globalState) ? GlobalStateHash.fromJSON(object.globalState) : undefined,
     };
   },
 
   toJSON(message: GlobalStateData): unknown {
     const obj: any = {};
-    message.reward !== undefined &&
-      (obj.reward = message.reward ? Reward.toJSON(message.reward) : undefined);
+    message.reward !== undefined && (obj.reward = message.reward ? Reward.toJSON(message.reward) : undefined);
     message.receipt !== undefined &&
-      (obj.receipt = message.receipt
-        ? TransactionReceipt.toJSON(message.receipt)
-        : undefined);
+      (obj.receipt = message.receipt ? TransactionReceipt.toJSON(message.receipt) : undefined);
     message.accountWrapper !== undefined &&
-      (obj.accountWrapper = message.accountWrapper
-        ? Account.toJSON(message.accountWrapper)
-        : undefined);
+      (obj.accountWrapper = message.accountWrapper ? Account.toJSON(message.accountWrapper) : undefined);
     message.globalState !== undefined &&
-      (obj.globalState = message.globalState
-        ? GlobalStateHash.toJSON(message.globalState)
-        : undefined);
+      (obj.globalState = message.globalState ? GlobalStateHash.toJSON(message.globalState) : undefined);
     return obj;
   },
 
-  fromPartial(object: DeepPartial<GlobalStateData>): GlobalStateData {
+  fromPartial<I extends Exact<DeepPartial<GlobalStateData>, I>>(object: I): GlobalStateData {
     const message = createBaseGlobalStateData();
-    message.reward =
-      object.reward !== undefined && object.reward !== null
-        ? Reward.fromPartial(object.reward)
-        : undefined;
-    message.receipt =
-      object.receipt !== undefined && object.receipt !== null
-        ? TransactionReceipt.fromPartial(object.receipt)
-        : undefined;
-    message.accountWrapper =
-      object.accountWrapper !== undefined && object.accountWrapper !== null
-        ? Account.fromPartial(object.accountWrapper)
-        : undefined;
-    message.globalState =
-      object.globalState !== undefined && object.globalState !== null
-        ? GlobalStateHash.fromPartial(object.globalState)
-        : undefined;
+    message.reward = (object.reward !== undefined && object.reward !== null)
+      ? Reward.fromPartial(object.reward)
+      : undefined;
+    message.receipt = (object.receipt !== undefined && object.receipt !== null)
+      ? TransactionReceipt.fromPartial(object.receipt)
+      : undefined;
+    message.accountWrapper = (object.accountWrapper !== undefined && object.accountWrapper !== null)
+      ? Account.fromPartial(object.accountWrapper)
+      : undefined;
+    message.globalState = (object.globalState !== undefined && object.globalState !== null)
+      ? GlobalStateHash.fromPartial(object.globalState)
+      : undefined;
     return message;
   },
 };
@@ -1875,20 +1572,14 @@ function createBaseGlobalStateStreamResponse(): GlobalStateStreamResponse {
 }
 
 export const GlobalStateStreamResponse = {
-  encode(
-    message: GlobalStateStreamResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: GlobalStateStreamResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.datum !== undefined) {
       GlobalStateData.encode(message.datum, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): GlobalStateStreamResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): GlobalStateStreamResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseGlobalStateStreamResponse();
@@ -1907,30 +1598,20 @@ export const GlobalStateStreamResponse = {
   },
 
   fromJSON(object: any): GlobalStateStreamResponse {
-    return {
-      datum: isSet(object.datum)
-        ? GlobalStateData.fromJSON(object.datum)
-        : undefined,
-    };
+    return { datum: isSet(object.datum) ? GlobalStateData.fromJSON(object.datum) : undefined };
   },
 
   toJSON(message: GlobalStateStreamResponse): unknown {
     const obj: any = {};
-    message.datum !== undefined &&
-      (obj.datum = message.datum
-        ? GlobalStateData.toJSON(message.datum)
-        : undefined);
+    message.datum !== undefined && (obj.datum = message.datum ? GlobalStateData.toJSON(message.datum) : undefined);
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<GlobalStateStreamResponse>
-  ): GlobalStateStreamResponse {
+  fromPartial<I extends Exact<DeepPartial<GlobalStateStreamResponse>, I>>(object: I): GlobalStateStreamResponse {
     const message = createBaseGlobalStateStreamResponse();
-    message.datum =
-      object.datum !== undefined && object.datum !== null
-        ? GlobalStateData.fromPartial(object.datum)
-        : undefined;
+    message.datum = (object.datum !== undefined && object.datum !== null)
+      ? GlobalStateData.fromPartial(object.datum)
+      : undefined;
     return message;
   },
 };
@@ -1940,17 +1621,11 @@ function createBaseAppEventStreamRequest(): AppEventStreamRequest {
 }
 
 export const AppEventStreamRequest = {
-  encode(
-    _: AppEventStreamRequest,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(_: AppEventStreamRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): AppEventStreamRequest {
+  decode(input: _m0.Reader | Uint8Array, length?: number): AppEventStreamRequest {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseAppEventStreamRequest();
@@ -1974,7 +1649,7 @@ export const AppEventStreamRequest = {
     return obj;
   },
 
-  fromPartial(_: DeepPartial<AppEventStreamRequest>): AppEventStreamRequest {
+  fromPartial<I extends Exact<DeepPartial<AppEventStreamRequest>, I>>(_: I): AppEventStreamRequest {
     const message = createBaseAppEventStreamRequest();
     return message;
   },
@@ -1985,20 +1660,14 @@ function createBaseAppEventStreamResponse(): AppEventStreamResponse {
 }
 
 export const AppEventStreamResponse = {
-  encode(
-    message: AppEventStreamResponse,
-    writer: _m0.Writer = _m0.Writer.create()
-  ): _m0.Writer {
+  encode(message: AppEventStreamResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.event !== undefined) {
       AppEvent.encode(message.event, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number
-  ): AppEventStreamResponse {
+  decode(input: _m0.Reader | Uint8Array, length?: number): AppEventStreamResponse {
     const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseAppEventStreamResponse();
@@ -2017,26 +1686,20 @@ export const AppEventStreamResponse = {
   },
 
   fromJSON(object: any): AppEventStreamResponse {
-    return {
-      event: isSet(object.event) ? AppEvent.fromJSON(object.event) : undefined,
-    };
+    return { event: isSet(object.event) ? AppEvent.fromJSON(object.event) : undefined };
   },
 
   toJSON(message: AppEventStreamResponse): unknown {
     const obj: any = {};
-    message.event !== undefined &&
-      (obj.event = message.event ? AppEvent.toJSON(message.event) : undefined);
+    message.event !== undefined && (obj.event = message.event ? AppEvent.toJSON(message.event) : undefined);
     return obj;
   },
 
-  fromPartial(
-    object: DeepPartial<AppEventStreamResponse>
-  ): AppEventStreamResponse {
+  fromPartial<I extends Exact<DeepPartial<AppEventStreamResponse>, I>>(object: I): AppEventStreamResponse {
     const message = createBaseAppEventStreamResponse();
-    message.event =
-      object.event !== undefined && object.event !== null
-        ? AppEvent.fromPartial(object.event)
-        : undefined;
+    message.event = (object.event !== undefined && object.event !== null)
+      ? AppEvent.fromPartial(object.event)
+      : undefined;
     return message;
   },
 };
@@ -2045,10 +1708,18 @@ declare var self: any | undefined;
 declare var window: any | undefined;
 declare var global: any | undefined;
 var globalThis: any = (() => {
-  if (typeof globalThis !== "undefined") return globalThis;
-  if (typeof self !== "undefined") return self;
-  if (typeof window !== "undefined") return window;
-  if (typeof global !== "undefined") return global;
+  if (typeof globalThis !== "undefined") {
+    return globalThis;
+  }
+  if (typeof self !== "undefined") {
+    return self;
+  }
+  if (typeof window !== "undefined") {
+    return window;
+  }
+  if (typeof global !== "undefined") {
+    return global;
+  }
   throw "Unable to locate global object";
 })();
 
@@ -2077,31 +1748,17 @@ function base64FromBytes(arr: Uint8Array): string {
   }
 }
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-export type DeepPartial<T> = T extends Builtin
-  ? T
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
+export type DeepPartial<T> = T extends Builtin ? T
+  : T extends Long ? string | number | Long : T extends Array<infer U> ? Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
 
-function longToNumber(long: Long): number {
-  if (long.gt(Number.MAX_SAFE_INTEGER)) {
-    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
-  }
-  return long.toNumber();
-}
+type KeysOfUnion<T> = T extends T ? keyof T : never;
+export type Exact<P, I extends P> = P extends Builtin ? P
+  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
 
 if (_m0.util.Long !== Long) {
   _m0.util.Long = Long as any;

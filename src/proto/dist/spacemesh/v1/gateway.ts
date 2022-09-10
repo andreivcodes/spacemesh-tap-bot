@@ -1,5 +1,7 @@
 /* eslint-disable */
+import Long from "long";
 import { CallContext, CallOptions } from "nice-grpc-common";
+import _m0 from "protobufjs/minimal";
 import { BroadcastPoetRequest, BroadcastPoetResponse } from "./gateway_types";
 
 export const protobufPackage = "spacemesh.v1";
@@ -26,7 +28,7 @@ export interface GatewayServiceServiceImplementation<CallContextExt = {}> {
   /** Submit a poet data packet to the network to broadcast */
   broadcastPoet(
     request: BroadcastPoetRequest,
-    context: CallContext & CallContextExt
+    context: CallContext & CallContextExt,
   ): Promise<DeepPartial<BroadcastPoetResponse>>;
 }
 
@@ -34,25 +36,19 @@ export interface GatewayServiceClient<CallOptionsExt = {}> {
   /** Submit a poet data packet to the network to broadcast */
   broadcastPoet(
     request: DeepPartial<BroadcastPoetRequest>,
-    options?: CallOptions & CallOptionsExt
+    options?: CallOptions & CallOptionsExt,
   ): Promise<BroadcastPoetResponse>;
 }
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-export type DeepPartial<T> = T extends Builtin
-  ? T
-  : T extends Array<infer U>
-  ? Array<DeepPartial<U>>
-  : T extends ReadonlyArray<infer U>
-  ? ReadonlyArray<DeepPartial<U>>
-  : T extends {}
-  ? { [K in keyof T]?: DeepPartial<T[K]> }
+export type DeepPartial<T> = T extends Builtin ? T
+  : T extends Long ? string | number | Long : T extends Array<infer U> ? Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
   : Partial<T>;
+
+if (_m0.util.Long !== Long) {
+  _m0.util.Long = Long as any;
+  _m0.configure();
+}
