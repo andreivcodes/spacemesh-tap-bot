@@ -7,14 +7,11 @@ import {
   derivePublicKey,
 } from "@andreivcodes/spacemeshlib/lib/src/crypto";
 import {
-  createGlobalStateChannel,
   getAccountBalance,
   getAccountNonce,
 } from "@andreivcodes/spacemeshlib/lib/src/global_state";
-import {
-  createTransactionChannel,
-  submitTransaction,
-} from "@andreivcodes/spacemeshlib/lib/src/tx";
+import { submitTransaction } from "@andreivcodes/spacemeshlib/lib/src/tx";
+import { createChannels } from "@andreivcodes/spacemeshlib/lib/src/channels";
 
 const { Client, GatewayIntentBits } = require("discord.js");
 require("dotenv").config();
@@ -78,7 +75,7 @@ async function sendSmesh({
 
   console.log(`Connecting to ${networkUrl}:443`);
 
-  createGlobalStateChannel(networkUrl, 443, true);
+  createChannels(networkUrl, 443, true);
 
   let accountNonce = await getAccountNonce(pk);
   let accountBalance = await getAccountBalance(pk);
@@ -98,7 +95,6 @@ async function sendSmesh({
     return;
   }
 
-  createTransactionChannel(networkUrl, 443, true);
   submitTransaction(Number(accountNonce), to, 1, 1, 100, sk)
     .then((response) => {
       message.reply(
