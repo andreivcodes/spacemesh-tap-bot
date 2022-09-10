@@ -166,14 +166,18 @@ async function sendSmesh({
           if (response.status?.code == 0) {
             message.reply(`just 💸  transferred funds to ${message.content}`);
             console.log(`just 💸  transferred funds to ${message.content}`);
-          } else message.reply(`could not transfer :(`);
+          } else
+            message.reply(
+              `could not transfer :( ${JSON.stringify(response.status)}`
+            );
         })
         .catch((e: any) => {
+          message.reply(`could not transfer :( submitTransaction failed`);
           console.log(e);
         });
     })
-
     .catch((e: any) => {
+      message.reply(`could not transfer :( accountDataQuery failed`);
       console.log(e);
     });
 }
