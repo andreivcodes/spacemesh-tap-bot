@@ -21,10 +21,9 @@ require("dotenv").config();
 
 //https://discord.com/api/oauth2/authorize?client_id=1006876873139163176&permissions=1088&scope=bot
 
-const senderSeed: string = process.env.SEEDPHRASE!;
+const SEED: string = process.env.SEEDPHRASE!;
 let url = "https://discover.spacemesh.io/networks.json";
 let networkUrl: string;
-let channel: Channel;
 
 async function main() {
   const client = new Client({
@@ -74,8 +73,8 @@ async function sendSmesh({
   amount: number;
   message: Message;
 }) {
-  let sk = (await derivePrivateKey(senderSeed, 0)) as Uint8Array;
-  let pk = (await derivePublicKey(senderSeed, 0)) as Uint8Array;
+  let sk = (await derivePrivateKey(SEED, 0)) as Uint8Array;
+  let pk = (await derivePublicKey(SEED, 0)) as Uint8Array;
 
   console.log(`Connecting to ${networkUrl}:443`);
 
