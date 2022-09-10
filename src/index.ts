@@ -158,10 +158,17 @@ async function sendSmesh({
           transaction: tx as Uint8Array,
         })
         .then((response: SubmitTransactionResponse) => {
-          console.log(`Sent tx id: ${toHexString(response.txstate?.id?.id!)}`);
           if (response.status?.code == 0) {
-            message.reply(`just 💸  transferred funds to ${message.content}`);
-            console.log(`just 💸  transferred funds to ${message.content}`);
+            message.reply(
+              `just 💸  transferred funds to ${
+                message.content
+              }. Tx ID: ${toHexString(response.txstate?.id?.id!)}`
+            );
+            console.log(
+              `just 💸  transferred funds to ${
+                message.content
+              }. Tx ID: ${toHexString(response.txstate?.id?.id!)}`
+            );
           } else
             message.reply(
               `could not transfer :( ${JSON.stringify(response.status)}`
