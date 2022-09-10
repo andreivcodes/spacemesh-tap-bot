@@ -41,7 +41,6 @@ const senderSeed: string = process.env.SEEDPHRASE!;
 let url = "https://discover.spacemesh.io/networks.json";
 let networkUrl: String;
 let channel: Channel;
-let initialMsgSend = false;
 
 async function main() {
   const client = new Client({
@@ -106,8 +105,6 @@ async function sendSmesh({
     channel
   );
 
-  let dec = new TextDecoder();
-
   const accountQueryId: AccountId = { address: pk };
 
   const accountQueryFilter: AccountDataFilter = {
@@ -136,6 +133,15 @@ async function sendSmesh({
           pk
         )} with nonce ${senderAccountNonce} and has a balance of ${senderAccountBalance} SMD`
       );
+
+      if (Number(senderAccountNonce) == 0) {
+        message.reply(`My counter is 0... is this the first transaction?`);
+        return;
+      }
+      if (Number(senderAccountBalance) < amount) {
+        message.reply(`I am out of funds :(`);
+        return;
+      }
 
       let tx = await signTransaction({
         accountNonce: Number(senderAccountNonce),
