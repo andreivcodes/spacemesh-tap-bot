@@ -33,10 +33,6 @@ require("dotenv").config();
 
 //https://discord.com/api/oauth2/authorize?client_id=1006876873139163176&permissions=1088&scope=bot
 
-declare global {
-  var Go: any;
-}
-
 const senderSeed: string = process.env.SEEDPHRASE!;
 let url = "https://discover.spacemesh.io/networks.json";
 let networkUrl: String;
