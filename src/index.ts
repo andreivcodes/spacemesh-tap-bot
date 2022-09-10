@@ -23,11 +23,12 @@ import {
 import { SubmitTransactionResponse } from "@andreivcodes/spacemeshlib/lib/src/proto/dist/spacemesh/v1/tx_types";
 import { AccountId } from "@andreivcodes/spacemeshlib/lib/src/proto/dist/spacemesh/v1/types";
 import {
-  derivePublicKey,
   toHexString,
-  derivePrivateKey,
   signTransaction,
-} from "@andreivcodes/spacemeshlib/lib/src/util";
+  derivePrivateKey,
+  derivePublicKey,
+} from "@andreivcodes/spacemeshlib/lib/src/crypto";
+
 const { Client, GatewayIntentBits } = require("discord.js");
 require("dotenv").config();
 
