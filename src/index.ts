@@ -162,12 +162,12 @@ async function sendSmesh({
             message.reply(
               `just 💸  transferred funds to ${
                 message.content
-              }. Tx ID: 0x${toHexString(response.txstate?.id?.id!)}`
+              }. \nTx ID: 0x${toHexString(response.txstate?.id?.id!)}`
             );
             console.log(
               `just 💸  transferred funds to ${
                 message.content
-              }. Tx ID: 0x${toHexString(response.txstate?.id?.id!)}`
+              }. \nTx ID: 0x${toHexString(response.txstate?.id?.id!)}`
             );
           } else
             message.reply(
