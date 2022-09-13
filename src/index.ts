@@ -7,7 +7,7 @@ import {
   getAccountBalance,
   getAccountNonce,
   submitTransaction,
-  createChannels,
+  createClients,
   SubmitTransactionResponse,
 } from "@andreivcodes/spacemeshlib";
 import { config } from "dotenv";
@@ -72,7 +72,7 @@ async function sendSmesh({
 
   console.log(`Connecting to ${networkUrl}:443`);
 
-  createChannels(networkUrl, 443, true);
+  createClients(networkUrl, 443, true);
 
   let accountNonce = await getAccountNonce(pk);
   let accountBalance = await getAccountBalance(pk);
@@ -92,7 +92,14 @@ async function sendSmesh({
     return;
   }
 
-  submitTransaction(Number(accountNonce), to, 1, 1, 100, sk)
+  submitTransaction({
+    accountNonce: accountNonce,
+    receiver: to,
+    gasLimit: 1,
+    fee: 1,
+    amount: 100,
+    secretKey: sk,
+  })
     .then((response: SubmitTransactionResponse) => {
       message.reply(
         `just 💸  transferred funds to ${

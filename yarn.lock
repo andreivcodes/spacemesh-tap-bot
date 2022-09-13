@@ -3,9 +3,9 @@
 
 
 "@andreivcodes/spacemeshlib@^1.0":
-  version "1.0.29"
-  resolved "https://registry.yarnpkg.com/@andreivcodes/spacemeshlib/-/spacemeshlib-1.0.29.tgz#501f269d99375e2780de12dcdc9d2d29af387f16"
-  integrity sha512-29D9/0376PohLWbE30zuOKdoXKI7NnwfZ5hvJm6ADhDImpWkvLPtvxd30x0enLElIx9qHPrUg5mrupI7cam/5Q==
+  version "1.0.31"
+  resolved "https://registry.yarnpkg.com/@andreivcodes/spacemeshlib/-/spacemeshlib-1.0.31.tgz#3b466e098dbaad0295e91446ff5fc3457a8ade68"
+  integrity sha512-+nbCr8gMcnrsANUk1zKkeZk9SgJRlRojJo7V+K8q7SJ1ket4pCGTJW5Vtp7ecxQ6zvN/ne+VoL50mlZm4obc9A==
   dependencies:
     bip39 "^3.0.4"
     js-xdr "^1.3.0"
