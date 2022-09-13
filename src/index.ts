@@ -1,20 +1,17 @@
-import { Channel } from "nice-grpc";
-import { Message } from "discord.js";
+import { Message, Client, GatewayIntentBits } from "discord.js";
 import fetch from "node-fetch";
 import {
   toHexString,
   derivePrivateKey,
   derivePublicKey,
-} from "@andreivcodes/spacemeshlib/lib/src/crypto";
-import {
   getAccountBalance,
   getAccountNonce,
-} from "@andreivcodes/spacemeshlib/lib/src/global_state";
-import { submitTransaction } from "@andreivcodes/spacemeshlib/lib/src/tx";
-import { createChannels } from "@andreivcodes/spacemeshlib/lib/src/channels";
-
-const { Client, GatewayIntentBits } = require("discord.js");
-require("dotenv").config();
+  submitTransaction,
+  createChannels,
+  SubmitTransactionResponse,
+} from "@andreivcodes/spacemeshlib";
+import { config } from "dotenv";
+config();
 
 //https://discord.com/api/oauth2/authorize?client_id=1006876873139163176&permissions=1088&scope=bot
 
@@ -96,7 +93,7 @@ async function sendSmesh({
   }
 
   submitTransaction(Number(accountNonce), to, 1, 1, 100, sk)
-    .then((response) => {
+    .then((response: SubmitTransactionResponse) => {
       message.reply(
         `just 💸  transferred funds to ${
           message.content
@@ -108,7 +105,7 @@ async function sendSmesh({
         }. \nTx ID: 0x${toHexString(response.txstate?.id?.id!)}`
       );
     })
-    .catch((err) => {
+    .catch((err: any) => {
       message.reply(`could not transfer :( submitTransaction failed`);
       console.log(err);
     });
