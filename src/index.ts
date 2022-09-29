@@ -85,7 +85,6 @@ async function sendSmesh({
 
   if (Number(accountNonce) == 0) {
     message.reply(`My counter is 0... is this the first transaction?`);
-    return;
   }
   if (Number(accountBalance) < amount) {
     message.reply(`I am out of funds :(`);
