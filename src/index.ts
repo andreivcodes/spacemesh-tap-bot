@@ -1,16 +1,29 @@
 import { Message, Client, GatewayIntentBits } from "discord.js";
 import fetch from "node-fetch";
+import { config } from "dotenv";
 import {
-  toHexString,
+  submitTransaction,
+  createGlobalStateClient,
+  createMeshClient,
+  createTransactionClient,
   derivePrivateKey,
   derivePublicKey,
-  getAccountBalance,
-  getAccountNonce,
-  submitTransaction,
-  createClients,
+  toHexString,
+  AccountDataFlag,
   SubmitTransactionResponse,
 } from "@andreivcodes/spacemeshlib";
-import { config } from "dotenv";
+import crypto from "crypto";
+import pkg from "@spacemesh/sm-codec";
+import Bech32 from "@spacemesh/address-wasm";
+import { sha256 } from "@spacemesh/sm-codec/lib/utils/crypto.js";
+
+(async () => {
+  Bech32.default.init();
+  Bech32.default.setHRPNetwork("smtest");
+})();
+
+const { SingleSigTemplate, TemplateRegistry } = pkg;
+
 config();
 
 //https://discord.com/api/oauth2/authorize?client_id=1006876873139163176&permissions=1088&scope=bot
@@ -38,7 +51,7 @@ async function main() {
       try {
         if (message.member.displayName != "spacemesh-tap-bot") {
           await getNetwork();
-          let address = (message.content as string).slice(2);
+          let address = message.content as string;
           await sendSmesh({ to: address, amount: 100, message: message });
         }
       } catch (e) {
@@ -72,10 +85,28 @@ async function sendSmesh({
 
   console.log(`Connecting to ${networkUrl}:443`);
 
-  createClients(networkUrl, 443, true);
+  const globalStateClient = createGlobalStateClient(networkUrl, 443, true);
+  const meshClient = createMeshClient(networkUrl, 443, true);
+  const txClient = createTransactionClient(networkUrl, 443, true);
 
-  let accountNonce = await getAccountNonce(pk);
-  let accountBalance = await getAccountBalance(pk);
+  const accountQueryResponse = await globalStateClient.accountDataQuery({
+    filter: {
+      accountId: {
+        address: "stest1qqqqqqq4ah6ncerdv5k78kclmpkaaxupaly9yrq4r4863",
+      },
+      accountDataFlags: AccountDataFlag.ACCOUNT_DATA_FLAG_ACCOUNT,
+    },
+    maxResults: 1,
+    offset: 0,
+  });
+
+  let accountNonce = Number(
+    accountQueryResponse.accountItem[0].accountWrapper?.stateProjected?.counter
+  );
+  let accountBalance = Number(
+    accountQueryResponse.accountItem[0].accountWrapper?.stateProjected?.balance
+      ?.value
+  );
 
   console.log(
     `Tap currently running on address 0x${toHexString(
@@ -91,14 +122,37 @@ async function sendSmesh({
     return;
   }
 
-  submitTransaction({
-    accountNonce: accountNonce,
-    receiver: to,
-    gasLimit: 1,
-    fee: 1,
-    amount: 100,
-    secretKey: sk,
-  })
+  const tpl = TemplateRegistry.get(SingleSigTemplate.key, 1);
+  const principal = tpl.principal({
+    PublicKey: Bech32.default.parse(
+      "stest1qqqqqqq4ah6ncerdv5k78kclmpkaaxupaly9yrq4r4863",
+      "stest"
+    ),
+  });
+
+  const payload = {
+    Arguments: {
+      Destination: Bech32.default.parse(to, "stest"),
+      Amount: BigInt(amount),
+    },
+    Nonce: {
+      Counter: BigInt(accountNonce),
+      Bitfield: BigInt(0),
+    },
+    GasPrice: BigInt(1),
+  };
+
+  const txEncoded = tpl.encode(principal, payload);
+  const genesisID = await (await meshClient.genesisID({})).genesisId;
+  const hashed = sha256(new Uint8Array([...genesisID, ...txEncoded]));
+  const sig = sign(hashed, toHexString(sk));
+
+  console.log(txEncoded);
+  console.log(sig);
+  const signed = tpl.sign(txEncoded, sig);
+
+  txClient
+    .submitTransaction({ transaction: signed })
     .then((response: SubmitTransactionResponse) => {
       message.reply(
         `just 💸  transferred funds to ${
@@ -116,5 +170,18 @@ async function sendSmesh({
       console.log(err);
     });
 }
+
+export const sign = (dataBytes: Uint8Array, privateKey: string) => {
+  const key = Buffer.concat([
+    Buffer.from("302e020100300506032b657004220420", "hex"), // DER privateKey prefix for ED25519
+    Buffer.from(privateKey, "hex"),
+  ]);
+  const pk = crypto.createPrivateKey({
+    format: "der",
+    type: "pkcs8",
+    key,
+  });
+  return Uint8Array.from(crypto.sign(null, dataBytes, pk));
+};
 
 main();
