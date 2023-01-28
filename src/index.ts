@@ -1,25 +1,39 @@
 import { Message, Client, GatewayIntentBits } from "discord.js";
 import fetch from "node-fetch";
 import { config } from "dotenv";
-import {
-  submitTransaction,
-  createGlobalStateClient,
-  createMeshClient,
-  createTransactionClient,
-  derivePrivateKey,
-  derivePublicKey,
-  toHexString,
-  AccountDataFlag,
-  SubmitTransactionResponse,
-} from "@andreivcodes/spacemeshlib";
 import crypto from "crypto";
 import pkg from "@spacemesh/sm-codec";
 import Bech32 from "@spacemesh/address-wasm";
 import { sha256 } from "@spacemesh/sm-codec/lib/utils/crypto.js";
+import { ChannelCredentials, createChannel, createClient } from "nice-grpc";
+import {
+  AccountDataFlag,
+  SubmitTransactionResponse,
+  toHexString,
+  GlobalStateServiceDefinition,
+  MeshServiceDefinition,
+  TransactionServiceDefinition,
+  file,
+  generateKeyPair,
+} from "@andreivcodes/spacemeshlib";
+
+import "./wasm_exec.js";
+
+const loadwasm = async () => {
+  // @ts-ignore
+  const go = new Go(); // eslint-disable-line no-undef
+  // @ts-ignore
+  const { instance } = await WebAssembly.instantiate(
+    Buffer.from(file),
+    go.importObject
+  );
+  go.run(instance);
+  console.log("wasm loaded");
+};
 
 (async () => {
   Bech32.default.init();
-  Bech32.default.setHRPNetwork("smtest");
+  Bech32.default.setHRPNetwork("stest");
 })();
 
 const { SingleSigTemplate, TemplateRegistry } = pkg;
@@ -33,6 +47,7 @@ let url = "https://discover.spacemesh.io/networks.json";
 let networkUrl: string;
 
 async function main() {
+  loadwasm();
   const client = new Client({
     intents: [
       GatewayIntentBits.Guilds,
@@ -80,19 +95,29 @@ async function sendSmesh({
   amount: number;
   message: Message;
 }) {
-  let sk = (await derivePrivateKey(SEED, 0)) as Uint8Array;
-  let pk = (await derivePublicKey(SEED, 0)) as Uint8Array;
-
   console.log(`Connecting to ${networkUrl}:443`);
 
-  const globalStateClient = createGlobalStateClient(networkUrl, 443, true);
-  const meshClient = createMeshClient(networkUrl, 443, true);
-  const txClient = createTransactionClient(networkUrl, 443, true);
+  const { publicKey, secretKey } = await generateKeyPair(SEED, 0);
+
+  const tpl = TemplateRegistry.get(SingleSigTemplate.key, 1);
+  const principal = tpl.principal({
+    PublicKey: publicKey,
+  });
+
+  const address = Bech32.default.generateAddress(principal);
+
+  const channel = createChannel(
+    `${networkUrl}:${443}`,
+    ChannelCredentials.createSsl()
+  );
+  const globalStateClient = createClient(GlobalStateServiceDefinition, channel);
+  const meshClient = createClient(MeshServiceDefinition, channel);
+  const txClient = createClient(TransactionServiceDefinition, channel);
 
   const accountQueryResponse = await globalStateClient.accountDataQuery({
     filter: {
       accountId: {
-        address: "stest1qqqqqqq4ah6ncerdv5k78kclmpkaaxupaly9yrq4r4863",
+        address: address,
       },
       accountDataFlags: AccountDataFlag.ACCOUNT_DATA_FLAG_ACCOUNT,
     },
@@ -109,9 +134,7 @@ async function sendSmesh({
   );
 
   console.log(
-    `Tap currently running on address 0x${toHexString(
-      pk
-    )} with nonce ${accountNonce} and has a balance of ${accountBalance} SMD`
+    `Tap currently running on address ${address} with nonce ${accountNonce} and has a balance of ${accountBalance} SMD`
   );
 
   if (Number(accountNonce) == 0) {
@@ -122,33 +145,22 @@ async function sendSmesh({
     return;
   }
 
-  const tpl = TemplateRegistry.get(SingleSigTemplate.key, 1);
-  const principal = tpl.principal({
-    PublicKey: Bech32.default.parse(
-      "stest1qqqqqqq4ah6ncerdv5k78kclmpkaaxupaly9yrq4r4863",
-      "stest"
-    ),
-  });
-
   const payload = {
     Arguments: {
-      Destination: Bech32.default.parse(to, "stest"),
+      Destination: Bech32.default.parse(to),
       Amount: BigInt(amount),
     },
     Nonce: {
       Counter: BigInt(accountNonce),
       Bitfield: BigInt(0),
     },
-    GasPrice: BigInt(1),
+    GasPrice: BigInt(500),
   };
 
   const txEncoded = tpl.encode(principal, payload);
   const genesisID = await (await meshClient.genesisID({})).genesisId;
   const hashed = sha256(new Uint8Array([...genesisID, ...txEncoded]));
-  const sig = sign(hashed, toHexString(sk));
-
-  console.log(txEncoded);
-  console.log(sig);
+  const sig = sign(hashed, toHexString(secretKey));
   const signed = tpl.sign(txEncoded, sig);
 
   txClient
@@ -157,12 +169,14 @@ async function sendSmesh({
       message.reply(
         `just 💸  transferred funds to ${
           message.content
-        }. \nTx ID: 0x${toHexString(response.txstate?.id?.id!)}`
+        }. \nTx ID: 0x${toHexString(response.txstate?.id?.id!)}
+     `
       );
       console.log(
         `just 💸  transferred funds to ${
           message.content
-        }. \nTx ID: 0x${toHexString(response.txstate?.id?.id!)}`
+        }. \nTx ID: 0x${toHexString(response.txstate?.id?.id!)}
+      `
       );
     })
     .catch((err: any) => {

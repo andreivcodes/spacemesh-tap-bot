@@ -29,7 +29,7 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
-    "@andreivcodes/spacemeshlib": "^1.0.42",
+    "@andreivcodes/spacemeshlib": "^2.0.0",
     "@spacemesh/address-wasm": "^0.2.0",
     "@spacemesh/sm-codec": "^0.3.3",
     "bip39": "^3.0.4",
