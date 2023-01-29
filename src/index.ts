@@ -68,7 +68,7 @@ async function main() {
       message.channel.type == ChannelType.GuildText &&
       message.member &&
       message.member.displayName != "spacemesh-tap-bot" &&
-      message.channel.name == "🏦tapp"
+      message.channel.name == "🏦tap"
     ) {
       try {
         if (message.content.length == 51) {
