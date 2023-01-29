@@ -115,30 +115,32 @@ const checkTx = async ({ tx, message }: { tx: string; message: Message }) => {
     .then((res) => {
       switch (res.transactionsState[0].state) {
         case TransactionState_TransactionState.TRANSACTION_STATE_UNSPECIFIED:
-          message.reply(`Transaction state is TRANSACTION_STATE_UNSPECIFIED`);
+          message.reply(`❓ Transaction state is unspecified.`);
           break;
         case TransactionState_TransactionState.TRANSACTION_STATE_REJECTED:
-          message.reply(`Transaction state is TRANSACTION_STATE_REJECTED`);
+          message.reply(`🚫 Transaction state is rejected.`);
           break;
         case TransactionState_TransactionState.TRANSACTION_STATE_INSUFFICIENT_FUNDS:
-          message.reply(
-            `Transaction state is TRANSACTION_STATE_INSUFFICIENT_FUNDS`
-          );
+          message.reply(`💸 Transaction state is insufficient funds.`);
           break;
         case TransactionState_TransactionState.TRANSACTION_STATE_CONFLICTING:
-          message.reply(`Transaction state is TRANSACTION_STATE_CONFLICTING`);
+          message.reply(`🚫 Transaction state is conflicting.`);
           break;
         case TransactionState_TransactionState.TRANSACTION_STATE_MEMPOOL:
-          message.reply(`Transaction state is TRANSACTION_STATE_MEMPOOL`);
+          message.reply(
+            `⏳ Transaction state is mempool. Should be picked up for execution soon.`
+          );
           break;
         case TransactionState_TransactionState.TRANSACTION_STATE_MESH:
-          message.reply(`Transaction state is TRANSACTION_STATE_MESH`);
+          message.reply(
+            `🚀 Transaction state is mesh. Should be executed soon.`
+          );
           break;
         case TransactionState_TransactionState.TRANSACTION_STATE_PROCESSED:
-          message.reply(`Transaction state is TRANSACTION_STATE_PROCESSED`);
+          message.reply(`✅ Transaction state is processed.`);
           break;
         case TransactionState_TransactionState.UNRECOGNIZED:
-          message.reply(`Transaction state is UNRECOGNIZED`);
+          message.reply(`❓ Transaction state is unrecognized.`);
           break;
         default:
           message.reply(`Idk lol`);
@@ -231,14 +233,7 @@ const sendSmesh = async ({
       message.reply(
         `just 💸  transferred funds to ${
           message.content
-        }. \nTx ID: 0x${toHexString(response.txstate?.id?.id!)}
-     `
-      );
-      console.log(
-        `just 💸  transferred funds to ${
-          message.content
-        }. \nTx ID: 0x${toHexString(response.txstate?.id?.id!)}
-      `
+        }. \nTx ID: 0x${toHexString(response.txstate?.id?.id!)}`
       );
     })
     .catch((err: any) => {
