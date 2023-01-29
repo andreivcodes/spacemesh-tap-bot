@@ -1,4 +1,4 @@
-import { Message, Client, GatewayIntentBits } from "discord.js";
+import { Message, Client, GatewayIntentBits, ChannelType } from "discord.js";
 import fetch from "node-fetch";
 import { config } from "dotenv";
 import crypto from "crypto";
@@ -15,6 +15,9 @@ import {
   TransactionServiceDefinition,
   file,
   generateKeyPair,
+  fromHexString,
+  TransactionsStateRequest,
+  TransactionState_TransactionState,
 } from "@andreivcodes/spacemeshlib";
 
 import "./wasm_exec.js";
@@ -44,7 +47,6 @@ config();
 
 const SEED: string = process.env.SEEDPHRASE!;
 let url = "https://discover.spacemesh.io/networks.json";
-let networkUrl: string;
 
 async function main() {
   loadwasm();
@@ -60,15 +62,25 @@ async function main() {
     console.log("Ready!");
   });
 
-  client.on("messageCreate", async (message: any) => {
+  client.on("messageCreate", async (message: Message) => {
     //our special channel
-    if (message.channel.name == "🏦tap" || message.channel.name == "tap") {
+    if (
+      message.channel.type == ChannelType.GuildText &&
+      message.member &&
+      message.member.displayName != "spacemesh-tap-bot" &&
+      message.channel.name == "🏦tapp"
+    ) {
       try {
-        if (message.member.displayName != "spacemesh-tap-bot") {
-          await getNetwork();
+        if (message.content.length == 51) {
           let address = message.content as string;
           await sendSmesh({ to: address, amount: 100, message: message });
-        }
+        } else if (message.content.length == 66) {
+          let txid = message.content as string;
+          await checkTx({ tx: txid, message: message });
+        } else
+          message.reply(
+            "Give me an address and I'll send you 100 smesh, or give me a txid and I'll tell you the state of the transaction."
+          );
       } catch (e) {
         console.log(e);
       }
@@ -79,14 +91,72 @@ async function main() {
 }
 
 async function getNetwork() {
-  await fetch(url)
+  const res = await fetch(url)
     .then((response) => response.json())
     .then((res: any) => {
-      networkUrl = res[0]["grpcAPI"].slice(0, -1).substring(8);
+      return res[0]["grpcAPI"].slice(0, -1).substring(8);
     });
+
+  return res;
 }
 
-async function sendSmesh({
+const checkTx = async ({ tx, message }: { tx: string; message: Message }) => {
+  const networkUrl = await getNetwork();
+  console.log(`Connecting to ${networkUrl}:443`);
+  const channel = createChannel(
+    `${networkUrl}:${443}`,
+    ChannelCredentials.createSsl()
+  );
+  const txClient = createClient(TransactionServiceDefinition, channel);
+
+  txClient
+    .transactionsState({
+      transactionId: [{ id: fromHexString(tx.substring(2)) }],
+    })
+    .then((res) => {
+      switch (res.transactionsState[0].state) {
+        case TransactionState_TransactionState.TRANSACTION_STATE_UNSPECIFIED:
+          message.reply(
+            `Transaction ${tx} state is TRANSACTION_STATE_UNSPECIFIED`
+          );
+          break;
+        case TransactionState_TransactionState.TRANSACTION_STATE_REJECTED:
+          message.reply(
+            `Transaction ${tx} state is TRANSACTION_STATE_REJECTED`
+          );
+          break;
+        case TransactionState_TransactionState.TRANSACTION_STATE_INSUFFICIENT_FUNDS:
+          message.reply(
+            `Transaction ${tx} state is TRANSACTION_STATE_INSUFFICIENT_FUNDS`
+          );
+          break;
+        case TransactionState_TransactionState.TRANSACTION_STATE_CONFLICTING:
+          message.reply(
+            `Transaction ${tx} state is TRANSACTION_STATE_CONFLICTING`
+          );
+          break;
+        case TransactionState_TransactionState.TRANSACTION_STATE_MEMPOOL:
+          message.reply(`Transaction ${tx} state is TRANSACTION_STATE_MEMPOOL`);
+          break;
+        case TransactionState_TransactionState.TRANSACTION_STATE_MESH:
+          message.reply(`Transaction ${tx} state is TRANSACTION_STATE_MESH`);
+          break;
+        case TransactionState_TransactionState.TRANSACTION_STATE_PROCESSED:
+          message.reply(
+            `Transaction ${tx} state is TRANSACTION_STATE_PROCESSED`
+          );
+          break;
+        case TransactionState_TransactionState.UNRECOGNIZED:
+          message.reply(`Transaction ${tx} state is UNRECOGNIZED`);
+          break;
+        default:
+          message.reply(`Idk lol`);
+          break;
+      }
+    });
+};
+
+const sendSmesh = async ({
   to,
   amount,
   message,
@@ -94,7 +164,8 @@ async function sendSmesh({
   to: string;
   amount: number;
   message: Message;
-}) {
+}) => {
+  const networkUrl = await getNetwork();
   console.log(`Connecting to ${networkUrl}:443`);
 
   const { publicKey, secretKey } = await generateKeyPair(SEED, 0);
@@ -183,9 +254,9 @@ async function sendSmesh({
       message.reply(`could not transfer :( submitTransaction failed`);
       console.log(err);
     });
-}
+};
 
-export const sign = (dataBytes: Uint8Array, privateKey: string) => {
+const sign = (dataBytes: Uint8Array, privateKey: string) => {
   const key = Buffer.concat([
     Buffer.from("302e020100300506032b657004220420", "hex"), // DER privateKey prefix for ED25519
     Buffer.from(privateKey, "hex"),
