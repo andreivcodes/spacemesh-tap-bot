@@ -45,7 +45,6 @@ config();
 //https://discord.com/api/oauth2/authorize?client_id=1006876873139163176&permissions=1088&scope=bot
 
 const SEED: string = process.env.SEEDPHRASE!;
-let url = "https://discover.spacemesh.io/networks.json";
 
 async function main() {
   loadwasm();
@@ -70,10 +69,13 @@ async function main() {
       message.channel.name == "🏦tap"
     ) {
       try {
-        if (message.content.length == 51) {
+        if (message.content.length == 51 && message.content.includes("stest")) {
           let address = message.content as string;
           await sendSmesh({ to: address, amount: 100, message: message });
-        } else if (message.content.length == 66) {
+        } else if (
+          message.content.length == 66 &&
+          message.content.includes("0x")
+        ) {
           let txid = message.content as string;
           await checkTx({ tx: txid, message: message });
         } else
@@ -81,7 +83,7 @@ async function main() {
             "Give me an address and I'll send you 100 smesh, or give me a txid and I'll tell you the state of the transaction."
           );
       } catch (e) {
-        console.log(e);
+        message.reply(`Something went wrong. Try again later. \n ${e}`);
       }
     }
   });
@@ -90,7 +92,7 @@ async function main() {
 }
 
 async function getNetwork() {
-  const res = await fetch(url)
+  const res = await fetch("https://discover.spacemesh.io/networks.json")
     .then((response) => response.json())
     .then((res: any) => {
       return res[0]["grpcAPI"].slice(0, -1).substring(8);
@@ -101,7 +103,6 @@ async function getNetwork() {
 
 const checkTx = async ({ tx, message }: { tx: string; message: Message }) => {
   const networkUrl = await getNetwork();
-  console.log(`Connecting to ${networkUrl}:443`);
   const channel = createChannel(
     `${networkUrl}:${443}`,
     ChannelCredentials.createSsl()
@@ -159,7 +160,6 @@ const sendSmesh = async ({
   message: Message;
 }) => {
   const networkUrl = await getNetwork();
-  console.log(`Connecting to ${networkUrl}:443`);
 
   const { publicKey, secretKey } = await generateKeyPair(SEED, 0);
 
