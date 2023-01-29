@@ -16,7 +16,6 @@ import {
   file,
   generateKeyPair,
   fromHexString,
-  TransactionsStateRequest,
   TransactionState_TransactionState,
 } from "@andreivcodes/spacemeshlib";
 
@@ -116,38 +115,30 @@ const checkTx = async ({ tx, message }: { tx: string; message: Message }) => {
     .then((res) => {
       switch (res.transactionsState[0].state) {
         case TransactionState_TransactionState.TRANSACTION_STATE_UNSPECIFIED:
-          message.reply(
-            `Transaction ${tx} state is TRANSACTION_STATE_UNSPECIFIED`
-          );
+          message.reply(`Transaction state is TRANSACTION_STATE_UNSPECIFIED`);
           break;
         case TransactionState_TransactionState.TRANSACTION_STATE_REJECTED:
-          message.reply(
-            `Transaction ${tx} state is TRANSACTION_STATE_REJECTED`
-          );
+          message.reply(`Transaction state is TRANSACTION_STATE_REJECTED`);
           break;
         case TransactionState_TransactionState.TRANSACTION_STATE_INSUFFICIENT_FUNDS:
           message.reply(
-            `Transaction ${tx} state is TRANSACTION_STATE_INSUFFICIENT_FUNDS`
+            `Transaction state is TRANSACTION_STATE_INSUFFICIENT_FUNDS`
           );
           break;
         case TransactionState_TransactionState.TRANSACTION_STATE_CONFLICTING:
-          message.reply(
-            `Transaction ${tx} state is TRANSACTION_STATE_CONFLICTING`
-          );
+          message.reply(`Transaction state is TRANSACTION_STATE_CONFLICTING`);
           break;
         case TransactionState_TransactionState.TRANSACTION_STATE_MEMPOOL:
-          message.reply(`Transaction ${tx} state is TRANSACTION_STATE_MEMPOOL`);
+          message.reply(`Transaction state is TRANSACTION_STATE_MEMPOOL`);
           break;
         case TransactionState_TransactionState.TRANSACTION_STATE_MESH:
-          message.reply(`Transaction ${tx} state is TRANSACTION_STATE_MESH`);
+          message.reply(`Transaction state is TRANSACTION_STATE_MESH`);
           break;
         case TransactionState_TransactionState.TRANSACTION_STATE_PROCESSED:
-          message.reply(
-            `Transaction ${tx} state is TRANSACTION_STATE_PROCESSED`
-          );
+          message.reply(`Transaction state is TRANSACTION_STATE_PROCESSED`);
           break;
         case TransactionState_TransactionState.UNRECOGNIZED:
-          message.reply(`Transaction ${tx} state is UNRECOGNIZED`);
+          message.reply(`Transaction state is UNRECOGNIZED`);
           break;
         default:
           message.reply(`Idk lol`);
