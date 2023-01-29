@@ -118,29 +118,29 @@ const checkTx = async ({ tx, message }: { tx: string; message: Message }) => {
           message.reply(`❓ Transaction state is unspecified.`);
           break;
         case TransactionState_TransactionState.TRANSACTION_STATE_REJECTED:
-          message.reply(`🚫 Transaction state is rejected.`);
+          message.reply(`🚫 Transaction is rejected.`);
           break;
         case TransactionState_TransactionState.TRANSACTION_STATE_INSUFFICIENT_FUNDS:
-          message.reply(`💸 Transaction state is insufficient funds.`);
+          message.reply(
+            `💸 Transaction is rejected due to insufficient funds.`
+          );
           break;
         case TransactionState_TransactionState.TRANSACTION_STATE_CONFLICTING:
-          message.reply(`🚫 Transaction state is conflicting.`);
+          message.reply(`🚫 Transaction is conflicting.`);
           break;
         case TransactionState_TransactionState.TRANSACTION_STATE_MEMPOOL:
           message.reply(
-            `⏳ Transaction state is mempool. Should be picked up for execution soon.`
+            `⏳ Transaction is in mempool. Should be picked up for execution soon.`
           );
           break;
         case TransactionState_TransactionState.TRANSACTION_STATE_MESH:
-          message.reply(
-            `🚀 Transaction state is mesh. Should be executed soon.`
-          );
+          message.reply(`🚀 Transaction is in mesh. Should be executed soon.`);
           break;
         case TransactionState_TransactionState.TRANSACTION_STATE_PROCESSED:
-          message.reply(`✅ Transaction state is processed.`);
+          message.reply(`✅ Transaction is processed.`);
           break;
         case TransactionState_TransactionState.UNRECOGNIZED:
-          message.reply(`❓ Transaction state is unrecognized.`);
+          message.reply(`❓ Transaction is unrecognized.`);
           break;
         default:
           message.reply(`Idk lol`);
