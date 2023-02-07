@@ -163,7 +163,7 @@ const sendSmesh = async ({
 
   const { publicKey, secretKey } = await generateKeyPair(SEED, 0);
 
-  const tpl = TemplateRegistry.get(SingleSigTemplate.key, 1);
+  const tpl = TemplateRegistry.get(SingleSigTemplate.key, 16);
   const principal = tpl.principal({
     PublicKey: publicKey,
   });
@@ -214,10 +214,7 @@ const sendSmesh = async ({
       Destination: Bech32.default.parse(to),
       Amount: BigInt(amount),
     },
-    Nonce: {
-      Counter: BigInt(accountNonce),
-      Bitfield: BigInt(0),
-    },
+    Nonce: BigInt(accountNonce),
     GasPrice: BigInt(500),
   };
 
