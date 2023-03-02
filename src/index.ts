@@ -4,7 +4,7 @@ import { config } from "dotenv";
 import crypto from "crypto";
 import pkg from "@spacemesh/sm-codec";
 import Bech32 from "@spacemesh/address-wasm";
-import { sha256 } from "@spacemesh/sm-codec/lib/utils/crypto.js";
+import * as sm from "@spacemesh/sm-codec";
 import { ChannelCredentials, createChannel, createClient } from "nice-grpc";
 import {
   AccountDataFlag,
@@ -201,9 +201,6 @@ const sendSmesh = async ({
     `Tap currently running on address ${address} with nonce ${accountNonce} and has a balance of ${accountBalance} SMD`
   );
 
-  if (Number(accountNonce) == 0) {
-    message.reply(`My counter is 0... is this the first transaction?`);
-  }
   if (Number(accountBalance) < amount) {
     message.reply(`I am out of funds :(`);
     return;
@@ -220,7 +217,7 @@ const sendSmesh = async ({
 
   const txEncoded = tpl.encode(principal, payload);
   const genesisID = await (await meshClient.genesisID({})).genesisId;
-  const hashed = sha256(new Uint8Array([...genesisID, ...txEncoded]));
+  const hashed = sm.hash(new Uint8Array([...genesisID, ...txEncoded]));
   const sig = sign(hashed, toHexString(secretKey));
   const signed = tpl.sign(txEncoded, sig);
 
