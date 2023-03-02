@@ -2,9 +2,8 @@ import { Message, Client, GatewayIntentBits, ChannelType } from "discord.js";
 import fetch from "node-fetch";
 import { config } from "dotenv";
 import crypto from "crypto";
-import pkg from "@spacemesh/sm-codec";
 import Bech32 from "@spacemesh/address-wasm";
-import * as sm from "@spacemesh/sm-codec";
+import pkg from "@spacemesh/sm-codec";
 import { ChannelCredentials, createChannel, createClient } from "nice-grpc";
 import {
   AccountDataFlag,
@@ -37,8 +36,6 @@ const loadwasm = async () => {
   Bech32.default.init();
   Bech32.default.setHRPNetwork("stest");
 })();
-
-const { SingleSigTemplate, TemplateRegistry } = pkg;
 
 config();
 
@@ -163,7 +160,7 @@ const sendSmesh = async ({
 
   const { publicKey, secretKey } = await generateKeyPair(SEED, 0);
 
-  const tpl = TemplateRegistry.get(SingleSigTemplate.key, 16);
+  const tpl = pkg.TemplateRegistry.get(pkg.SingleSigTemplate.key, 16);
   const principal = tpl.principal({
     PublicKey: publicKey,
   });
@@ -215,11 +212,11 @@ const sendSmesh = async ({
     GasPrice: BigInt(500),
   };
 
-  const txEncoded = tpl.encode(principal, payload);
+  const encodedTx = tpl.encode(principal, payload);
   const genesisID = await (await meshClient.genesisID({})).genesisId;
-  const hashed = sm.hash(new Uint8Array([...genesisID, ...txEncoded]));
+  const hashed = pkg.hash(new Uint8Array([...genesisID, ...encodedTx]));
   const sig = sign(hashed, toHexString(secretKey));
-  const signed = tpl.sign(txEncoded, sig);
+  const signed = tpl.sign(encodedTx, sig);
 
   txClient
     .submitTransaction({ transaction: signed })
