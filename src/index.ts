@@ -199,7 +199,7 @@ const sendSmesh = async ({
   );
 
   if (Number(accountBalance) < amount) {
-    message.reply(`I am out of funds :( send me some SMH here: ${address}`);
+    message.reply(`I am out of funds :( send me some SMH here: **${address}**`);
     return;
   }
 
