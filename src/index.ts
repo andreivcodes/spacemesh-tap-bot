@@ -4,7 +4,9 @@ import { config } from "dotenv";
 import crypto from "crypto";
 import Bech32 from "@spacemesh/address-wasm";
 import pkg from "@spacemesh/sm-codec";
+import { derive_key } from "@spacemesh/ed25519-bip32";
 import { ChannelCredentials, createChannel, createClient } from "nice-grpc";
+import * as bip39 from "bip39";
 import {
   AccountDataFlag,
   SubmitTransactionResponse,
@@ -13,7 +15,6 @@ import {
   MeshServiceDefinition,
   TransactionServiceDefinition,
   file,
-  generateKeyPair,
   fromHexString,
   TransactionState_TransactionState,
 } from "@andreivcodes/spacemeshlib";
@@ -65,23 +66,23 @@ async function main() {
       message.member.displayName != "spacemesh-tap-bot" &&
       message.channel.name == "🏦tap"
     ) {
-      try {
-        if (message.content.length == 51 && message.content.includes("stest")) {
-          let address = message.content as string;
-          await sendSmesh({ to: address, amount: 100, message: message });
-        } else if (
-          message.content.length == 66 &&
-          message.content.includes("0x")
-        ) {
-          let txid = message.content as string;
-          await checkTx({ tx: txid, message: message });
-        } else
-          message.reply(
-            "Give me an address and I'll send you 100 smidge, or give me a txid and I'll tell you the state of the transaction."
-          );
-      } catch (e) {
-        message.reply(`Something went wrong. Try again later. \n ${e}`);
-      }
+      // try {
+      if (message.content.length == 51 && message.content.includes("stest")) {
+        let address = message.content as string;
+        await sendSmesh({ to: address, amount: 100, message: message });
+      } else if (
+        message.content.length == 66 &&
+        message.content.includes("0x")
+      ) {
+        let txid = message.content as string;
+        await checkTx({ tx: txid, message: message });
+      } else
+        message.reply(
+          "Give me an address and I'll send you 100 smidge, or give me a txid and I'll tell you the state of the transaction."
+        );
+      // } catch (e) {
+      //   message.reply(`Something went wrong. Try again later. \n ${e}`);
+      // }
     }
   });
 
@@ -147,6 +148,10 @@ const checkTx = async ({ tx, message }: { tx: string; message: Message }) => {
     });
 };
 
+const COIN_TYPE = 540;
+const BIP_PROPOSAL = 44;
+const path = `m/${BIP_PROPOSAL}'/${COIN_TYPE}'/0'/0'/${0}'`;
+
 const sendSmesh = async ({
   to,
   amount,
@@ -158,7 +163,11 @@ const sendSmesh = async ({
 }) => {
   const networkUrl = await getNetwork();
 
-  const { publicKey, secretKey } = await generateKeyPair(SEED, 0);
+  const seed = bip39.mnemonicToSeedSync(SEED);
+
+  const p0 = await derive_key(seed, path);
+  const publicKey = p0.slice(32);
+  const secretKey = p0;
 
   const tpl = pkg.TemplateRegistry.get(pkg.SingleSigTemplate.key, 16);
   const principal = tpl.principal({
@@ -212,10 +221,14 @@ const sendSmesh = async ({
     GasPrice: BigInt(500),
   };
 
+  console.log(payload);
+
   const encodedTx = tpl.encode(principal, payload);
   const genesisID = await (await meshClient.genesisID({})).genesisId;
-  const hashed = pkg.hash(new Uint8Array([...genesisID, ...encodedTx]));
-  const sig = sign(hashed, toHexString(secretKey));
+  const sig = sign(
+    new Uint8Array([...genesisID, ...encodedTx]),
+    toHexString(secretKey)
+  );
   const signed = tpl.sign(encodedTx, sig);
 
   txClient

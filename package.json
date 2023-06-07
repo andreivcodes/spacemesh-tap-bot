@@ -20,28 +20,29 @@
   },
   "keywords": [],
   "devDependencies": {
-    "@types/node": "^18.14.4",
-    "@types/node-fetch": "^2.6.2",
-    "nodemon": "^2.0.20",
-    "rimraf": "^4.1.3",
+    "@types/node": "^20.2.5",
+    "@types/node-fetch": "^2.6.4",
+    "nodemon": "^2.0.22",
+    "rimraf": "^5.0.1",
     "ts-node": "^10.9.1",
-    "tsup": "^6.6.3",
-    "typescript": "^4.9.5"
+    "tsup": "^6.7.0",
+    "typescript": "^5.1.3"
   },
   "dependencies": {
     "@andreivcodes/spacemeshlib": "^2.1.0",
     "@spacemesh/address-wasm": "^0.2.0",
+    "@spacemesh/ed25519-bip32": "^0.1.0",
     "@spacemesh/sm-codec": "^0.4.1",
     "bip39": "^3.1.0",
     "crypto": "^1.0.1",
-    "discord.js": "^14.7.1",
-    "dotenv": "^16.0.3",
-    "js-xdr": "^1.3.0",
-    "long": "^5.2.1",
-    "nice-grpc": "^2.1.0",
-    "nice-grpc-common": "^2.0.1",
+    "discord.js": "^14.11.0",
+    "dotenv": "^16.1.4",
+    "js-xdr": "^2.0.0",
+    "long": "^5.2.3",
+    "nice-grpc": "^2.1.4",
+    "nice-grpc-common": "^2.0.2",
     "node-fetch": "3",
     "nope.db": "^0.0.9",
-    "protobufjs": "^7.2.2"
+    "protobufjs": "^7.2.3"
   }
 }
