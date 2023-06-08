@@ -83,6 +83,7 @@ async function main() {
             await sendSmesh({ to: address, amount: 1000, message: message });
             rateLimit.set(message.author.username, new Date());
           } else {
+            message.react("👎");
             message.reply(
               `Slow down... ${(12 - differenceInHours).toFixed(0)}h remaining`
             );
@@ -260,6 +261,7 @@ const sendSmesh = async ({
           message.content
         }. \nTx ID: 0x${toHexString(response.txstate?.id?.id!)}`
       );
+      message.react("👍");
     })
     .catch((err: any) => {
       message.reply(`could not transfer :( submitTransaction failed`);
