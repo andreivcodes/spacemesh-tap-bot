@@ -58,6 +58,8 @@ async function main() {
     console.log("Ready!");
   });
 
+  let rateLimit = new Map<string, Date>();
+
   client.on("messageCreate", async (message: Message) => {
     //our special channel
     if (
@@ -69,7 +71,26 @@ async function main() {
       // try {
       if (message.content.length == 51 && message.content.includes("stest")) {
         let address = message.content as string;
-        await sendSmesh({ to: address, amount: 100, message: message });
+        const currentDate = new Date();
+        const userLastActionDate = rateLimit.get(message.author.username);
+
+        if (userLastActionDate) {
+          const differenceInMilliseconds =
+            currentDate.getTime() - userLastActionDate.getTime();
+          const differenceInHours = differenceInMilliseconds / (1000 * 60 * 60);
+
+          if (differenceInHours > 12) {
+            await sendSmesh({ to: address, amount: 100, message: message });
+            rateLimit.set(message.author.username, new Date());
+          } else {
+            message.reply(
+              `Slow down... ${(12 - differenceInHours).toFixed(0)}h remaining`
+            );
+          }
+        } else {
+          await sendSmesh({ to: address, amount: 100, message: message });
+          rateLimit.set(message.author.username, new Date());
+        }
       } else if (
         message.content.length == 66 &&
         message.content.includes("0x")
