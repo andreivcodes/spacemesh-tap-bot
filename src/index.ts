@@ -80,7 +80,7 @@ async function main() {
           const differenceInHours = differenceInMilliseconds / (1000 * 60 * 60);
 
           if (differenceInHours > 12) {
-            await sendSmesh({ to: address, amount: 100, message: message });
+            await sendSmesh({ to: address, amount: 1000, message: message });
             rateLimit.set(message.author.username, new Date());
           } else {
             message.reply(
@@ -88,7 +88,7 @@ async function main() {
             );
           }
         } else {
-          await sendSmesh({ to: address, amount: 100, message: message });
+          await sendSmesh({ to: address, amount: 1000, message: message });
           rateLimit.set(message.author.username, new Date());
         }
       } else if (
