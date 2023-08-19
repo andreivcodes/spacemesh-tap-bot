@@ -100,7 +100,7 @@ async function main() {
         await checkTx({ tx: txid, message: message });
       } else
         message.reply(
-          "Give me an address and I'll send you 100 smidge, or give me a txid and I'll tell you the state of the transaction."
+          "Give me an address and I'll send you 2000000 smidge, or give me a txid and I'll tell you the state of the transaction."
         );
       // } catch (e) {
       //   message.reply(`Something went wrong. Try again later. \n ${e}`);
@@ -226,7 +226,7 @@ const sendSmesh = async ({
   );
 
   console.log(
-    `Tap currently running on address ${address} with nonce ${accountNonce} and has a balance of ${accountBalance} SMD`
+    `Tap currently running on address ${address} with nonce ${accountNonce} and has a balance of ${accountBalance} SMH`
   );
 
   if (Number(accountBalance) < amount) {
